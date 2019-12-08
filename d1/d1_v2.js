@@ -1,11 +1,10 @@
+//Part 2
 const fs = require('fs');
 
 const readFile = (filename) => {
   return new Promise((res, rej) => {
-    // console.log("READING");
     fs.readFile(`./${filename}`, 'utf8', (err, data) => {
       if (err) throw err;
-      // console.log(data.split('\n'));
       res(data.trim().split('\n'));
     });
   })

@@ -1,11 +1,10 @@
+//Part 1
 const fs = require('fs');
 
 const readFile = (filename) => {
   return new Promise((res, rej) => {
-    console.log("READING");
     fs.readFile(`./1.txt`, 'utf8', (err, data) => {
       if (err) throw err;
-      // console.log(data.split('\n'));
       res(data.trim().split('\n'));
     });
   })
@@ -26,5 +25,3 @@ const getTotalFuel = function(masses) {
 }
 readFile(`1.txt`)
   .then(res => console.log(getTotalFuel(res)));
-
-// console.log(getTotalFuel(masses));

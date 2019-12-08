@@ -1,11 +1,10 @@
+//Part 2
 const fs = require('fs');
 
 const readFile = (filename, splitToken) => {
   return new Promise((res, rej) => {
-    // console.log("READING");
     fs.readFile(`./${filename}`, 'utf8', (err, data) => {
       if (err) throw err;
-      // console.log(data.split('\n'));
       res(data.trim().split(splitToken));
     });
   })
@@ -35,9 +34,6 @@ const analyze = (codes) => {
       performUpdate(codes, term1, term2, pos, mult);
     }
   }
-
-  // console.log(codes);
-  console.log(codes[0]);
 };
 
 
@@ -45,6 +41,5 @@ readFile(`2.txt`, ',')
   .then(res => {
     let codes = res.map(v => Number(v));
     analyze(codes);
-    // console.log(codes);
   });
 
