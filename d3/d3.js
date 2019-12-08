@@ -1,3 +1,6 @@
+// Create a set of locations where the first wire is, then traverse through the second wire 
+// and check if the position overlaps with the first by checking the set. 
+// For any matches, compute the Manhattan distance and store it. Finally sort and return the lowest distance.
 const fs = require('fs');
 
 const readFile = (filename, splitToken) => {
