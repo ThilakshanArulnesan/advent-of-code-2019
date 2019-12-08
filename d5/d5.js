@@ -42,31 +42,40 @@ const analyze = (codes, input = 1) => {
 
     if (opCode === 99) break;
 
+    switch (opCode) {
+      case 1:
+        {
+          let term1 = codes[i + 1];
+          let term2 = codes[i + 2];
+          let pos = codes[i + 3];
 
-    if (opCode === 1) {
-      let term1 = codes[i + 1];
-      let term2 = codes[i + 2];
-      let pos = codes[i + 3];
+          performUpdate(codes, term1, term2, pos, sum, instructions);
+          incr = 4;
+          break;
+        }
+      case 2: {
+        let term1 = codes[i + 1];
+        let term2 = codes[i + 2];
+        let pos = codes[i + 3];
 
-      performUpdate(codes, term1, term2, pos, sum, instructions);
-      incr = 4;
-    } else if (opCode === 2) {
-      let term1 = codes[i + 1];
-      let term2 = codes[i + 2];
-      let pos = codes[i + 3];
-
-      performUpdate(codes, term1, term2, pos, mult, instructions);
-      incr = 4;
-    } else if (opCode === 3) {
-      instructions[2] = 1;
-      instructions[3] = 1;
-      let pos = codes[i + 1];
-      performUpdate(codes, input, 0, pos, sum, instructions);
-      incr = 2;
-    } else if (opCode === 4) {
-      incr = 2;
-      let pos = codes[i + 1];
-      console.log("OUTPUT: ", codes[pos]);
+        performUpdate(codes, term1, term2, pos, mult, instructions);
+        incr = 4;
+        break;
+      }
+      case 3: {
+        instructions[2] = 1;
+        instructions[3] = 1;
+        let pos = codes[i + 1];
+        performUpdate(codes, input, 0, pos, sum, instructions);
+        incr = 2;
+        break;
+      }
+      case 4: {
+        incr = 2;
+        let pos = codes[i + 1];
+        console.log("OUTPUT: ", codes[pos]);
+        break;
+      }
     }
   }
 };
