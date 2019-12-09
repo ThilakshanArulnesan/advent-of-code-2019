@@ -69,8 +69,11 @@ readFile(`6.txt`, '\n')
         break;
       }
     }
-    console.log(yourOrbits.length + santaOrbits.length); //Sum the length of the two arrays left
 
+
+    console.log(yourOrbits.length + santaOrbits.length); //Sum the length of the two arrays left
+    //Note we don't include the first common ancestor (one less than number of planets between you and santa)
+    //This is because we are counting TRANSFERS btwn planets (which will always be n-1 where n is the number of planents between you and santa)
 
   });
 
