@@ -1,0 +1,22 @@
+{
+  "name": "advent",
+  "version": "1.0.0",
+  "description": "- These are my solutions to the some of the advent of code challenges found [here](https://adventofcode.com/2019/).  - Each day consists of two problems.em with the text 'V2' in the filename. - My goal with these challenges is to attempt to solve as many days that I can",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ThilakshanArulnesan/advent-of-code-2019.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ThilakshanArulnesan/advent-of-code-2019/issues"
+  },
+  "homepage": "https://github.com/ThilakshanArulnesan/advent-of-code-2019#readme",
+  "dependencies": {
+    "chalk": "^3.0.0"
+  }
+}
