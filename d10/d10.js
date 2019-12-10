@@ -24,8 +24,6 @@ readFile(`10.txt`, '\n')
         }
       }
     }
-    // console.log(matrix);
-    // console.log(asteroidLocations);
 
     let asteroidCount = asteroidLocations.map((asteroid, i, asteroidLocations) => {
       let slopes = {}; //store the slopes found so far (round to 4 dec. to avoid decimal approx errors)
@@ -37,32 +35,17 @@ readFile(`10.txt`, '\n')
         let dx = otherAsteroid.x - asteroid.x
 
         let slope = Math.round(dy / dx * 10000) / 10000; //Four decimals (arbritrary, would need more as size of puzzle increases)
-        // if (asteroid.x === 2 && asteroid.y === 2) {
-        //   console.log(`Asteroid ${otherAsteroid.x},${otherAsteroid.y} has a slope of: ${slope}.`);
-        // }
 
         if (slopes[slope] === undefined) {
-          // if (asteroid.x === 2 && asteroid.y === 2) {
-          //   console.log(`   Adding asteroid ${otherAsteroid.x},${otherAsteroid.y} (first time slope).`);
-          // }
           if (dy > 0) {
             slopes[slope] = [true, false];
           } else if (dy < 0) {
             slopes[slope] = [false, true];
-          } else { //dy = 0
-            // if (asteroid.x === 2 && asteroid.y === 2) {
-            //   console.log(`   In the else.`);
-            // }
+          } else {//dy = 0
             if (dx > 0) {
               slopes[slope] = [true, false];
-              // if (asteroid.x === 2 && asteroid.y === 2) {
-              //   console.log(`   dx>0.`);
-              // }
             } else {
               slopes[slope] = [false, true];
-              // if (asteroid.x === 2 && asteroid.y === 2) {
-              //   console.log(`   dx<0.`);
-              // }
             }
           }
           numAsteroids++;
@@ -77,15 +60,9 @@ readFile(`10.txt`, '\n')
           if (dx > 0 && !slopes[slope][0]) {
             slopes[slope] = [true, true];
             numAsteroids++;
-            // if (asteroid.x === 2 && asteroid.y === 2) {
-            //   console.log(`   Adding asteroid ${otherAsteroid.x},${otherAsteroid.y} (dx>0 first time).`);
-            // }
           } else if (dx < 0 && !slopes[slope][1]) {
             slopes[slope] = [true, true];
             numAsteroids++;
-            // if (asteroid.x === 2 && asteroid.y === 2) {
-            //   console.log(`   Adding asteroid ${otherAsteroid.x},${otherAsteroid.y} (dx< 0 first time).`);
-            // }
           }
         }
 
