@@ -1,5 +1,7 @@
+//Part 2 required a refactor of part 1 to include angles in order to solve this part more easily.
+
 const fs = require('fs');
-const chalk = require('chalk');
+
 const readFile = (filename, splitToken) => {
   return new Promise((res, rej) => {
     fs.readFile(`./${filename}`, 'utf8', (err, data) => {
@@ -10,7 +12,7 @@ const readFile = (filename, splitToken) => {
 };
 
 
-readFile(`ex.txt`, '\n')
+readFile(`10.txt`, '\n')
   .then(res => {
     let asteroidLocations = [];
     let matrix = [];
@@ -24,11 +26,12 @@ readFile(`ex.txt`, '\n')
         }
       }
     }
-    mapping = {};
-    bestMapping = {};
-    bestAsteroid = {};
-    let maxSoFar = 0;
+    let bestMapping = {};
+    let bestAsteroid = {};
+    let maxSoFar = 0; //Stores count of max number of asteroids
+
     asteroidLocations.forEach((asteroid, i, asteroidLocations) => {
+      mapping = {};
       let angles = new Set(); //store the slopes found so far (round to 4 dec. to avoid decimal approx errors)
       let numAsteroids = 0;
 
@@ -39,13 +42,12 @@ readFile(`ex.txt`, '\n')
         let dx = otherAsteroid.x - asteroid.x
 
         let angle = Math.acos(dy / Math.sqrt(dx ** 2 + dy ** 2)); //Four decimals (arbritrary, would need more as size of puzzle increases)
+
         if (dx < 0) { // Corrects based on the quadrant since acos(x) maps angles >180 to angles < 180
-          if (dy < 0) {
-            angle = angle + Math.PI / 2;
-          } else if (dy > 0) {
-            angle = angle + 3 * Math.PI / 2;
-          } else if (dy === 0) {
+          if (dy === 0) { //180 degrees
             angle = angle + Math.PI;
+          } else {
+            angle = 2 * Math.PI - angle;
           }
         }
 
@@ -57,16 +59,12 @@ readFile(`ex.txt`, '\n')
           }
         }
 
-        angle = Math.round(angle * 1000) / 1000;
+        angle = Math.round(angle * 100000) / 100000;
         if (!mapping[angle]) {
           mapping[angle] = [];
           mapping[angle].push(otherAsteroid);
         } else {
           mapping[angle].push(otherAsteroid);
-        }
-        // console.log(angle);
-        if (asteroid.x === 2 && asteroid.y === 2) {
-          console.log(`Asteroid ${otherAsteroid.x},${otherAsteroid.y} has an angle of: ${angle}. dx=${dx}, dy=${dy}`);
         }
 
         if (!angles.has(angle)) {
@@ -76,23 +74,17 @@ readFile(`ex.txt`, '\n')
 
       }
       if (numAsteroids >= maxSoFar) {
-        console.log(`Best is at ${asteroid.x},${asteroid.y}`)
         maxSoFar = numAsteroids;
         bestAsteroid = asteroid;
         bestMapping = { ...mapping };
       }
-
-      mapping = {}; //reset
-      // return { loc: asteroid, num: numAsteroids };
     });
+
     let sortedKeys = Object.keys(bestMapping).sort((a, b) => a - b);
-    console.log(sortedKeys);
+
     let count = 0;
-    while (count < 1) {
+    while (count < 200) { //we want the 200th match
       for (let angle of sortedKeys) {
-        console.log(angle, bestMapping[angle].map((ast) => {
-          return { x: ast.x - bestAsteroid.x, y: ast.y - bestAsteroid.y }
-        }));
         if (bestMapping[angle].length > 0) {
           count++;
           let closest = (bestMapping[angle][0].x - bestAsteroid.x) ** 2 + (bestMapping[angle][0].y - bestAsteroid.y) ** 2;
@@ -107,9 +99,8 @@ readFile(`ex.txt`, '\n')
 
           bestMapping[angle] = bestMapping[angle].filter(asteroid => asteroid !== poppedAsteroid);//pew pew
 
-          console.log(`The ${chalk.blue(count)} asteroid to be vaporized is at ${poppedAsteroid.x}, ${poppedAsteroid.y} (${poppedAsteroid.x - bestAsteroid.x},${poppedAsteroid.y - bestAsteroid.y})`)
           if (count === 200) {
-            console.log(poppedAsteroid);
+            console.log(poppedAsteroid); //Solution 
           }
         }
       }
