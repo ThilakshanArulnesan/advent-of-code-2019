@@ -12,35 +12,26 @@ const updateVelocity = (moons) => {
   moons.forEach((moon, i) => {
     moons.forEach(otherMoon => {
       if (otherMoon !== moon) {
-        // console.log(moons);
-        // console.log(otherMoon);
         moon.vel.x += Math.sign(otherMoon.pos.x - moon.pos.x);
         moon.vel.y += Math.sign(otherMoon.pos.y - moon.pos.y);
         moon.vel.z += Math.sign(otherMoon.pos.z - moon.pos.z);
       }
     })
   });
-  // console.log(updatedMoons);
-  // console.log(moons);
   return moons;
 }
 
 const updatePosition = (moons) => {
-  // console.log('moon[0]', moons[0]);
-  // console.log('moons:', moons)
   moons.map(moon => {
-    // console.log('this moon is: ', moon);
     moon.pos.x += moon.vel.x;
     moon.pos.y += moon.vel.y;
     moon.pos.z += moon.vel.z;
   });
-  // console.log('new moons', moons);
   return moons;
 }
 
 readFile(`12.txt`, '\n')
   .then(moonInitialPos => {
-    // console.log(moonInitialPos);
     let moons = moonInitialPos.map(m => {
       let pos = {};
       pos.x = Number(m.match(/(?<=<x=)-?[0-9]*/)[0]);
@@ -55,7 +46,6 @@ readFile(`12.txt`, '\n')
         vel: vel
       };
     })
-    // console.log(moons);
     for (let i = 0; i <= 999; i++) {
       console.log(`After ${i} steps:\n${moons.map(m => `pos=<x=${m.pos.x}, y=${m.pos.y}, z=${m.pos.z}>. vel=<x=${m.vel.x}, y= ${m.vel.y}, z=${m.vel.z},`).join('\n')}\n\n`);
       updateVelocity(moons);
