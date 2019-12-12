@@ -39,8 +39,9 @@ class IntCodeProgram {
   analyze(input) {
     let incr = 4;
     let start = this.pointer;
+    // console.log(start);
     let offset = this.relativeOffset;
-    console.log(this.code);
+    // console.log(this.code);
 
     for (let i = start; i < this.code.length; i += incr) {
       this.pointer = i;
@@ -68,7 +69,7 @@ class IntCodeProgram {
       }
 
       if (opCode === 99) {
-        return null;
+        return NaN;
       }
 
       switch (opCode) {
@@ -93,16 +94,18 @@ class IntCodeProgram {
             }
             incr = 2;
           } else {
-            return null;
+            return NaN;
           }
-
           break;
         }
 
         case 4: {
           incr = 2;
           this.pointer = i + 2; //Store the location of where to restart the machine when it is used again
-          console.log(term1);
+          // console.log(term1);
+          // console.log("EXIT", this.pointer, this.relativeOffset);
+
+          return term1;
           break;
         }
         case 5: {

@@ -14,7 +14,7 @@ const readFile = (filename, splitToken) => {
 
 
 const writePos = (x, y) => {
-  return `(${x},${y})`;
+  return `${x},${y}`;
 }
 
 const mod = (n, m) => {
@@ -62,8 +62,8 @@ readFile(`11.txt`, ',')
     let robot = new IntCodeProgram(codes, 0, 0); //initialze robot
 
     // let robot = new IntCodeProgram(codes, 0, 0); //initialze robot
-    let output1 = robot.analyze([0]);
-    let output2 = robot.analyze([0]);
+    let output1 = robot.analyze([1]); //white panel
+    let output2 = robot.analyze([1]); //white panel
     let tiles = {};
     // 0 = Up, 1 = Left, 2 = Down, 3 = right
     let pos = { x: 0, y: 0, facing: 0 };
@@ -80,8 +80,36 @@ readFile(`11.txt`, ',')
       output1 = robot.analyze([col]);
       output2 = robot.analyze([col]);
     }
-    console.log(tiles);
-    console.log(Object.keys(tiles).length);
+    // console.log(tiles);
+    // console.log(Object.keys(tiles).length);
+    let locs = Object.keys(tiles).map(val => { return { x: Number(val.split(',')[0]), y: Number(val.split(',')[1]) } });
+    console.log(locs);
+    let minX = locs.reduce((p, c) => c.x <= p ? c.x : p, 0);
+    let minY = locs.reduce((p, c) => c.y <= p ? c.y : p, 0);
+    console.log(minX);
+    console.log(minY);
+    let adjustLocs = locs.map(val => { return { x: val.x - minX, y: val.y - minY } });
 
+    let maxX = adjustLocs.reduce((p, c) => c.x >= p ? c.x : p, 0);
+    let maxY = adjustLocs.reduce((p, c) => c.y >= p ? c.y : p, 0);
+    console.log(adjustLocs)
+    console.log(maxX, maxY)
+    let arr = [];
+    for (let i = 0; i <= maxX; i++) {
+      arr[i] = [];
+      for (let j = 0; j <= maxY; j++) {
+        arr[i][j] = 2;
+      }
+    }
+
+    adjustLocs.forEach((loc, i) => arr[loc.x][loc.y] = tiles[Object.keys(tiles)[i]]);
+
+    console.log(arr);
+    // let retS = '';
+    // for (let tile in tiles) {
+    //   console.log(tile, tiles[tile]);
+    //   retS += `${tile}:${tiles[tile]}\n`;
+    // }
+    // fs.writeFile('./11_out.txt', retS, () => { });
   });
 
