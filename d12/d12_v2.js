@@ -9,8 +9,8 @@ const readFile = (filename, splitToken) => {
   })
 };
 const updateVelocity = (moons) => {
-  moons.forEach((moon, i) => {
-    moons.forEach(otherMoon => {
+  moons.forEach((moon) => {
+    moons.forEach(otherMoon => {//O(m^2)...but m =4
       if (otherMoon !== moon) {
         moon.vel.x += Math.sign(otherMoon.pos.x - moon.pos.x);
         moon.vel.y += Math.sign(otherMoon.pos.y - moon.pos.y);
@@ -30,23 +30,52 @@ const updatePosition = (moons) => {
   return moons;
 }
 
-const areTheSame = (state, moons) => {
-
+const checkX = (state, moons) => {
   for (let [i, moon] of moons.entries()) { //slow
     if (state[i].pos.x !== moon.pos.x
-      || state[i].pos.y !== moon.pos.y
-      || state[i].pos.z !== moon.pos.z
       || state[i].vel.x !== moon.vel.x
-      || state[i].vel.y !== moon.vel.y
-      || state[i].vel.z !== moon.vel.z) {
+    ) {
       return false
     }
   }
   return true;
-  return false;
 }
 
-readFile(`ex.txt`, '\n')
+const checkY = (state, moons) => {
+  for (let [i, moon] of moons.entries()) { //slow
+    if (state[i].pos.y !== moon.pos.y
+      || state[i].vel.y !== moon.vel.y
+    ) {
+      return false
+    }
+  }
+  return true;
+}
+
+const checkZ = (state, moons) => {
+  for (let [i, moon] of moons.entries()) { //slow
+    if (state[i].pos.z !== moon.pos.z
+      || state[i].vel.z !== moon.vel.z
+    ) {
+      return false
+    }
+  }
+  return true;
+}
+
+const gcd = (a, b) => {
+  if (a === 0) return b;
+  if (b === 0) return a;
+
+  return gcd(b, a % b);
+
+}
+
+const lcm = (arr) => {
+  return arr.reduce((p, c) => p * c / gcd(p, c), 1);
+}
+
+readFile(`12.txt`, '\n')
   .then(moonInitialPos => {
     let moons = moonInitialPos.map(m => {
       let pos = {};
@@ -62,38 +91,41 @@ readFile(`ex.txt`, '\n')
         vel: vel
       };
     })
-    let seenStates = {};
+
+    let initialState = JSON.parse(JSON.stringify(moons));
+
     let i = 0;
+    let xPeriodicity;
+    let yPeriodicity;
+    let zPeriodicity;
     while (true) {
-      // console.log(`After ${i} steps:\n${moons.map(m => `pos=<x=${m.pos.x}, y=${m.pos.y}, z=${m.pos.z}>. vel=<x=${m.vel.x}, y= ${m.vel.y}, z=${m.vel.z},`).join('\n')}\n\n`);
-      if (i % 100000 === 0) {
-        console.log(i);
-      }
       updateVelocity(moons);
       moons = updatePosition(moons);
 
-      let totEn = moons.map(m => (Math.abs(m.pos.x) + Math.abs(m.pos.y) + Math.abs(m.pos.z)) * (Math.abs(m.vel.x) + Math.abs(m.vel.y) + Math.abs(m.vel.z))).reduce((p, c) => p + c, 0);
+      let totEn = moons.map(m => (Math.abs(m.vel.x) + Math.abs(m.vel.y) + Math.abs(m.vel.z))).reduce((p, c) => p + c, 0);
 
-      if (seenStates[totEn]) {
-        // console.log("SAME ENERGY!")
-        let flag = false;
-        seenStates[totEn].forEach((state) => {
-          if (areTheSame(state, moons)) {
-            flag = true;
-          }
-        });
-        if (flag) {
-          break;
-        } else {
-          seenStates[totEn].push(JSON.parse(JSON.stringify(moons)));
-        }
-
-      } else {
-        seenStates[totEn] = [];
-        seenStates[totEn].push(JSON.parse(JSON.stringify(moons)));
+      if (checkX(initialState, moons) && !xPeriodicity) {
+        xPeriodicity = i + 1;
       }
+
+      if (checkY(initialState, moons) && !yPeriodicity) {
+        yPeriodicity = i + 1;
+      }
+
+      if (checkZ(initialState, moons) && !zPeriodicity) {
+        zPeriodicity = i + 1;
+      }
+
+
+      if (xPeriodicity && yPeriodicity && zPeriodicity) {
+        break;
+      }
+
       i++
     }
 
-    // console.log(totEn)
+    console.log(xPeriodicity, yPeriodicity, zPeriodicity);
+
+    let ans = lcm([xPeriodicity, yPeriodicity, zPeriodicity])
+    console.log('ans:', ans);
   });
