@@ -26,13 +26,13 @@ readFile(`13.txt`, ',')
     let score = 0;
 
     while (!finished) {
-      let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
+      let robot = new IntCodeProgram(codes, 0, 0); //initialze robot
 
       if (nextMove !== undefined) {
         savedMoveSet.push(nextMove);
       }
 
-      let moves = [...savedMoveSet];
+      let moves = [nextMove];
 
       let output = robot.analyze(moves);
       let game = [];
@@ -53,9 +53,7 @@ readFile(`13.txt`, ',')
         if (x === -1 && y === 0) {
           if (type > score) {
             score = type;
-            console.log(`SCORE: `, score);
           }
-          continue;
         }
 
         if (!screen[y]) {
@@ -81,15 +79,14 @@ readFile(`13.txt`, ',')
       }
 
       nextMove = Math.sign((ballX) - padX);
-      if (score > 13000) {
-        for (let line in screen) {
-          console.log(screen[line].join(' '));
-        }
+
+      for (let line in screen) {
+        console.log(screen[line].join(' '));
       }
 
-      // await wait(100);
+      // await wait(100); //uncomment to watch the game play out slower
     }
-    console.log(score);
+    console.log("FINAL SCORE: ", score);
   });
 
 
