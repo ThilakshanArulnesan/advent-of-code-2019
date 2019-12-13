@@ -11,38 +11,85 @@ const readFile = (filename, splitToken) => {
   })
 };
 
+let wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 
 //Note making the machines objects each with their own pointers & version of the code could simplify the code below
 readFile(`13.txt`, ',')
-  .then(res => {
+  .then(async (res) => {
     let codes = res.map(v => Number(v));
     // console.log(codes);
-    let robot = new IntCodeProgram(codes, 0, 0); //initialze robot
 
-    let output = robot.analyze([1]);
-    let game = [];
-    while (!isNaN(output)) {
-      game.push(output);
-      output = robot.analyze([-1])
-    }
+    let savedMoveSet = [];
+    let nextMove;
+    let finished = false;
+    let score = 0;
 
-    console.log(game);
+    while (!finished) {
+      let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
 
-    console.log(game.reduce((p, c) => c > p ? c : p, 0));
-    console.log(game.reduce((p, c) => c < p ? c : p, 0));
-    // console.log(game.length);
-    // console.log(game.length / 3);
-
-    tileMap = {};
-    let count = 0;
-    for (let i = 2; i < game.length; i += 3) {
-      if (game[i] === 2) {
-        count++;
+      if (nextMove !== undefined) {
+        savedMoveSet.push(nextMove);
       }
 
-    }
-    console.log(count);
+      let moves = [...savedMoveSet];
 
+      let output = robot.analyze(moves);
+      let game = [];
+      while (!isNaN(output)) {
+        game.push(output);
+        output = robot.analyze(moves)
+      }
+
+      let screen = [];
+      let padX;
+      let ballX;
+      finished = true;
+      for (let i = 0; i < game.length; i += 3) {
+        let x = game[i];
+        let y = game[i + 1];
+        let type = game[i + 2];
+
+        if (x === -1 && y === 0) {
+          if (type > score) {
+            score = type;
+            console.log(`SCORE: `, score);
+          }
+          continue;
+        }
+
+        if (!screen[y]) {
+          screen[y] = [];
+        }
+        screen[y][x] = type;
+        if (type === 3) {
+          screen[y][x] = '🏸';
+          padX = x;
+        }
+
+        if (type === 1)
+          screen[y][x] = '🧱';
+        if (type === 2) {
+          screen[y][x] = '💰';
+          finished = false;
+        }
+        if (type === 4) {
+          screen[y][x] = '⚽️';
+          ballX = x;
+        }
+        // if (ballX && padX && !finished) break; //got all the info we need. Small optimization
+      }
+
+      nextMove = Math.sign((ballX) - padX);
+      if (score > 13000) {
+        for (let line in screen) {
+          console.log(screen[line].join(' '));
+        }
+      }
+
+      // await wait(100);
+    }
+    console.log(score);
   });
 
 

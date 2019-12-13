@@ -86,7 +86,9 @@ class IntCodeProgram {
         }
 
         case 3: {
+          // console.log('I got this', input);
           if (input.length >= 1) {
+            // console.log('received input', input[0]);
             if (instructions[2] === 2) {
               this.code[term1 + offset] = input.shift();
             } else {
