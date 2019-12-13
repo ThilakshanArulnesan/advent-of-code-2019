@@ -102,9 +102,8 @@ readFile(`12.txt`, '\n')
       updateVelocity(moons);
       moons = updatePosition(moons);
 
-      let totEn = moons.map(m => (Math.abs(m.vel.x) + Math.abs(m.vel.y) + Math.abs(m.vel.z))).reduce((p, c) => p + c, 0);
-
-      if (checkX(initialState, moons) && !xPeriodicity) {
+      //Get the periodicity of each component (they are all independent of each other)
+      if (checkX(initialState, moons) && !xPeriodicity) { //Only need to compare with initial state as any cycle MUST include the initial state.
         xPeriodicity = i + 1;
       }
 
@@ -117,15 +116,14 @@ readFile(`12.txt`, '\n')
       }
 
 
-      if (xPeriodicity && yPeriodicity && zPeriodicity) {
+      if (xPeriodicity && yPeriodicity && zPeriodicity) { //Once all are found we are good to go
         break;
       }
-
       i++
     }
 
     console.log(xPeriodicity, yPeriodicity, zPeriodicity);
 
-    let ans = lcm([xPeriodicity, yPeriodicity, zPeriodicity])
+    let ans = lcm([xPeriodicity, yPeriodicity, zPeriodicity]); //Find LCM, which is the first point when they all repeat
     console.log('ans:', ans);
   });
