@@ -34,9 +34,9 @@ describe('createReactions', () => {
 
   it('should read line 1', () => {
     expect(reactions['A']).to.eql({
-      num: 1,
+      num: 10,
       reactants: {
-        'ORE': 1
+        'ORE': 10
       }
     });
 
@@ -47,7 +47,6 @@ describe('createReactions', () => {
 describe('calculateFuelFromFile', () => {
   it('should work with a basic example', async () => {
     val = await calculateFuelFromFile('./d14/ex0.txt');
-    console.log(val);
     expect(val).to.equal(31);
   });
   it('should work with a simple example', async () => {
@@ -60,7 +59,7 @@ describe('calculateFuelFromFile', () => {
   });
   it('should handle more complex reactions', async () => {
     val = await calculateFuelFromFile('./d14/ex3.txt');
-    expect(val).to.equal(180687);
+    expect(val).to.equal(180697);
   });
   it('should handle more large complex reactions', async () => {
     val = await calculateFuelFromFile('./d14/ex4.txt');
