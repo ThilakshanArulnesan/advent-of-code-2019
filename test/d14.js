@@ -1,5 +1,6 @@
 let expect = require('chai').expect;
 let { calculateFuelFromFile, createReactions } = require('../d14/d14');
+let { calculateMaxFuel } = require('../d14/d14_v2.js');
 
 
 describe('createReactions', () => {
@@ -64,5 +65,20 @@ describe('calculateFuelFromFile', () => {
   it('should handle more large complex reactions', async () => {
     val = await calculateFuelFromFile('./d14/ex4.txt');
     expect(val).to.equal(2210736);
+  });
+});
+
+describe('should find total fuel for a recursive example', () => {
+  it('should work recursively', async () => {
+    val = await calculateMaxFuel('./d14/ex2.txt');
+    expect(val).to.equal(82892753);
+  });
+  it('should handle more complex reactions', async () => {
+    val = await calculateMaxFuel('./d14/ex3.txt');
+    expect(val).to.equal(5586022);
+  });
+  it('should handle more large complex reactions', async () => {
+    val = await calculateMaxFuel('./d14/ex4.txt');
+    expect(val).to.equal(460664);
   });
 });

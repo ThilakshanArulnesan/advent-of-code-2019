@@ -31,8 +31,8 @@ const createReactions = (lines) => {
       retObj[productAndCount[1].trim()].reactants[r[1]] = Number(r[0]);
     })
   });
-  return retObj;
 
+  return retObj;
 }
 
 const getOre = (product, amount, formula, excessMaterial) => {
