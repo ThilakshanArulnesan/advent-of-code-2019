@@ -10,15 +10,6 @@ const readFile = (filename, splitToken) => {
   })
 };
 
-const gcd = (a, b) => {
-  if (a === 0) return b;
-  if (b === 0) return a;
-  return gcd(b, a % b);
-}
-
-const getGCDofArr = (arr) => {
-  return arr.reduce((p, c) => gcd(p, c), arr[0]);
-}
 
 const createReactions = (lines) => {
   let retObj = {};
@@ -28,22 +19,16 @@ const createReactions = (lines) => {
 
     //Splits all the reactants
     let reactantsAndCount = temp[0].trim().split(',').map(r => r.trim().split(' '));
-    let productAndCount = temp[1].trim().split(' '); //assume one product
-    //Find GCD of all the coefficients, this is to simplify the problem later
-    // let gcdArr = reactantsAndCount.map(r => Number(r[0]));
-    // gcdArr = [...gcdArr, Number(productAndCount[0].trim())];
+    let productAndCount = temp[1].trim().split(' ');
 
-    // let gcd = getGCDofArr(gcdArr); 
-
-    let gcd = 1;
 
     retObj[productAndCount[1].trim()] = {
-      num: Number(productAndCount[0]) / gcd,
+      num: Number(productAndCount[0]),
       reactants: {}
     }
 
     reactantsAndCount.forEach(r => {
-      retObj[productAndCount[1].trim()].reactants[r[1]] = Number(r[0] / gcd);
+      retObj[productAndCount[1].trim()].reactants[r[1]] = Number(r[0]);
     })
   });
   return retObj;
@@ -92,5 +77,5 @@ const calculateFuelFromFile = async (filename) => {
   return amntOfOre;
 }
 
-module.exports = { calculateFuelFromFile, createReactions }
+module.exports = { calculateFuelFromFile, createReactions, getOre, readFile };
 
