@@ -4,7 +4,8 @@
   "description": "- These are my solutions to the some of the advent of code challenges found [here](https://adventofcode.com/2019/).  - Each day consists of two problems.em with the text 'V2' in the filename. - My goal with these challenges is to attempt to solve as many days that I can",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test",
+    "test:watch": "mocha --watch ./test ./"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,8 @@
   },
   "homepage": "https://github.com/ThilakshanArulnesan/advent-of-code-2019#readme",
   "dependencies": {
-    "chalk": "^3.0.0"
+    "chai": "^4.2.0",
+    "chalk": "^3.0.0",
+    "mocha": "^6.2.2"
   }
 }
