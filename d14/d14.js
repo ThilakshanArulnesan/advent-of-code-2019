@@ -30,10 +30,12 @@ const createReactions = (lines) => {
     let reactantsAndCount = temp[0].trim().split(',').map(r => r.trim().split(' '));
     let productAndCount = temp[1].trim().split(' '); //assume one product
     //Find GCD of all the coefficients, this is to simplify the problem later
-    let gcdArr = reactantsAndCount.map(r => Number(r[0]));
-    gcdArr = [...gcdArr, Number(productAndCount[0].trim())];
+    // let gcdArr = reactantsAndCount.map(r => Number(r[0]));
+    // gcdArr = [...gcdArr, Number(productAndCount[0].trim())];
 
-    let gcd = getGCDofArr(gcdArr);
+    // let gcd = getGCDofArr(gcdArr); 
+
+    let gcd = 1;
 
     retObj[productAndCount[1].trim()] = {
       num: Number(productAndCount[0]) / gcd,
@@ -49,28 +51,44 @@ const createReactions = (lines) => {
 }
 
 const getOre = (product, amount, formula, excessMaterial) => {
-  console.log(`GETTING ORE FOR ${product} (${amount})`);
   if (product === "ORE") {//base case
-    console.log(`  RETURNING ${amount} ORE`);
-
     return amount;
   }
+
   let reactants = formula[product].reactants;
+
+  if (excessMaterial[product]) {
+    if (amount <= excessMaterial[product]) {
+      excessMaterial[product] -= amount;
+      return 0;
+    } else {
+      amount -= excessMaterial[product];
+      excessMaterial[product] = 0;
+    }
+  }
+
+  let numReq = Math.ceil(amount / formula[product].num);
+  let amntExcess = numReq * formula[product].num - amount;
+
+  if (!excessMaterial[product]) {
+    excessMaterial[product] = amntExcess;
+  } else {
+    excessMaterial[product] += amntExcess;
+  }
 
   let totOre = 0;
   for (let reactant in reactants) {
-    totOre += getOre(reactant, reactants[reactant], formula, []) * amount;
+    totOre += getOre(reactant, reactants[reactant] * numReq, formula, excessMaterial);
   }
   return totOre;
 };
 
 const calculateFuelFromFile = async (filename) => {
-  // console.log(filename);
 
   res = await readFile(filename, '\n');
-
   let formula = createReactions(res);
-  let amntOfOre = getOre("FUEL", 1, formula, []);
+  let amntOfOre = getOre("FUEL", 1, formula, {});
+
   return amntOfOre;
 }
 
