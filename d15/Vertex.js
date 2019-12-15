@@ -10,7 +10,7 @@ class Vertex {
     //links neigbors together.
     this.neighbours[dir - 1] = neighbour;
 
-
+    //Get opposite direction (N => S, S=>N, E=>W, W=>E)
     if (dir === 1) {
       dir = 2;
     } else if (dir === 2) {

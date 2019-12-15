@@ -13,7 +13,7 @@ const readFile = (filename, splitToken) => {
 };
 
 const updatePos = (pos, dir) => {
-  // console.log(`in update pos, pos ${pos.x}, ${pos.y}, dir`)
+
   if (dir === 1) {
     pos.y++;
   }
@@ -43,21 +43,15 @@ const djikstra = (set, start, end) => {
     q.sort((v1, v2) => v1.dist - v2.dist);
 
     let nextVertex = q.shift(); //grab the next element
-    // console.log('nextVertex:', nextVertex);
-    // console.log('nextVertex.neighbours:', nextVertex.neighbours)
+
     nextVertex.neighbours.forEach(neighbour => {
       if (neighbour && !visited.has(neighbour.identifier())) {
-        // console.log("NEIGHBOR CHECKING IN", neighbour)
         if (neighbour.dist > nextVertex.dist + 1) {
           neighbour.dist = nextVertex.dist + 1
         }
-        // if (!q.includes(neighbour)) {
         q.push(neighbour); //add to queue
-        // }
       }
     });
-    // console.log(q);
-    // console.log(q.length);
     visited.add(nextVertex.identifier());
   }
 
@@ -65,39 +59,32 @@ const djikstra = (set, start, end) => {
   return end.dist;
 }
 
-//Note making the machines objects each with their own pointers & version of the code could simplify the code below
+
 readFile(`15.txt`, ',')
   .then(async (res) => {
     let codes = res.map(v => Number(v));
-    const explorationOrder = [4, 2, 3, 1];
 
     let robot = new IntCodeProgram(codes, 0, 0); //initialze robot
     let curPos = { x: 0, y: 0 };
     let start = new Vertex(curPos);//start position
     let endVertex = null;
 
+    const explorationOrder = [4, 2, 3, 1]; //E,S,W,N
     let curVtx = start;
     let dir = 0; //always go right
-    // let numExit = 100;
+
 
     let seenSoFar = { [posToString(curPos)]: start };
     do {
-      // if (--numExit < 0) break;
+
       let statusCode = robot.analyze([explorationOrder[dir]]);
       if (isNaN(statusCode)) break;
-      // if (curPos.x === 0 && curPos.y === 0) {
-      //   // console.log('curPos:', curPos);
-      //   console.log('dir:', explorationOrder[dir]);
-      //   console.log('statusCode:', statusCode);
-      //   console.log('curVtx:', curVtx)
-      //   // console.log('neighbours', curVtx.neighbours);
-      // }
-
 
       if (statusCode === 1 || statusCode === 2) {
         updatePos(curPos, explorationOrder[dir]);
-        // console.log('newPos:', curPos);
+
         let tmpVtx = seenSoFar[posToString(curPos)];
+
         if (!tmpVtx) {
           tmpVtx = new Vertex({ ...curPos });
           seenSoFar[posToString(curPos)] = tmpVtx;
@@ -112,9 +99,7 @@ readFile(`15.txt`, ',')
       } else if (statusCode === 0) {
         curVtx.addWall(explorationOrder[dir]);
         dir = (dir + 3) % 4;
-        // console.log('changing direction to ', explorationOrder[dir]);
       }
-      // console.log('\n\n');
     } while (curPos.x !== 0 || curPos.y !== 0 ||
     curVtx.neighbours[0] === undefined
     || curVtx.neighbours[1] === undefined
@@ -122,12 +107,9 @@ readFile(`15.txt`, ',')
       || curVtx.neighbours[3] === undefined
     );
 
-    // console.log('endVertex:', endVertex);
     start.dist = 0;
-    console.log('startPos:', start);
-    console.log(' start.neighbours:', start.neighbours)
     let dist = djikstra(seenSoFar, start, endVertex);
-    console.log('dist:', dist)
+    console.log('Minumum dist:', dist)
   });
 
 
