@@ -34,7 +34,7 @@ const posToString = (pos) => {
   return `${pos.x},${pos.y}`;
 }
 
-const djikstra = (set, start, end) => {
+const djikstra = (start, end) => {
   let endCondition = end.identifier();
   let visited = new Set();
   let q = [start];
@@ -108,7 +108,7 @@ readFile(`15.txt`, ',')
     );
 
     start.dist = 0;
-    let dist = djikstra(seenSoFar, start, endVertex);
+    let dist = djikstra(start, endVertex);
     console.log('Minumum dist:', dist)
   });
 
