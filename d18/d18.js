@@ -87,15 +87,12 @@ const findOptimalPath = (maze, start, numKeys) => {
 };
 
 
-readFile(`ex1.txt`, '\n')
+readFile(`18.txt`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
     let start = getStart(maze);
     let numKeys = findAllKeys(maze).length;
 
-    // console.log(maze);
-    // console.log(start);
-    // console.log(numKeys);
     let leastSteps = findOptimalPath(maze, start, numKeys);
     console.log(leastSteps);
   });
