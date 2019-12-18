@@ -1,15 +1,13 @@
 class Traverser {
-  // Stack of direction travelled
-  // Set of visited nodes
-  // copy of visited node count
-  constructor(start, numVisitable, uniqueSet = new Set(), numKeys, stack = [], botNum = 0) {
-    this.uniqueSet = new Set(uniqueSet);//Make a clone
+
+  constructor(start, maze, keysFound = new Set(), numKeys, stepsTaken = 0) {
+    this.stepsTaken = 0;
+    this.keysFound = new Set(keysFound);//Make a clone
     this.numKeys = numKeys;
     this.stack = [...stack];
     this.botNum = botNum;
-
     this.location = start;
-    this.numVisitable = numVisitable;
+    this.maze = maze;
   }
 
   isVisitable(i, j) {
@@ -20,76 +18,56 @@ class Traverser {
     }
   }
 
-  getVisitable2() {
-    let visitable = [];
-    let i = this.location[0];
-    let j = this.location[1];
-
-    let lastMove = this.stack[this.stack.length - 1];
-
-    if (lastMove !== 'N' && this.numVisitable[i + 1] && this.numVisitable[i + 1][j] > 0) {
-      visitable.push([i + 1, j, 'S']);
-    }
-    if (lastMove !== 'S' && this.numVisitable[i - 1] && this.numVisitable[i - 1][j] > 0) {
-      visitable.push([i - 1, j, 'N']);
-    }
-    if (lastMove !== 'W' && this.numVisitable[i][j + 1] > 0) {
-      visitable.push([i, j + 1, 'E']);
-    }
-    if (lastMove !== 'E' && this.numVisitable[i][j - 1] > 0) {
-      visitable.push([i, j - 1, 'W']);
-    }
-
-    return visitable;
-  }
-
   getVisitable() {
     let visitable = [];
     let i = this.location[0];
     let j = this.location[1];
 
-    let lastMove = this.stack[this.stack.length - 1];
-    if (lastMove === 'N' && this.numVisitable[i - 1] && this.numVisitable[i - 1][j] > 0) {
-      return [[i - 1, j, 'N']];
-    } else if (lastMove === 'S' && this.numVisitable[i + 1] && this.numVisitable[i + 1][j] > 0) {
-      return [[i + 1, j, 'S']];
-    } else if (lastMove === 'E' && this.numVisitable[i][j + 1] > 0) {
-      return [[i, j + 1, 'E']];
-    } else if (lastMove === 'W' && this.numVisitable[i][j - 1] > 0) {
-      return [[i, j - 1, 'W']];
+    if (this.numVisitable[i + 1] && this.numVisitable[i + 1][j] === '.') {
+      visitable.push([i + 1, j]);
+    }
+    if (this.numVisitable[i - 1] && this.numVisitable[i - 1][j] === '.') {
+      visitable.push([i - 1, j]);
+    }
+    if (this.numVisitable[i][j + 1] === '.') {
+      visitable.push([i, j + 1]);
+    }
+    if (this.numVisitable[i][j - 1] === '.') {
+      visitable.push([i, j - 1]);
     }
 
-
-
-    if (lastMove !== 'N' && this.numVisitable[i + 1] && this.numVisitable[i + 1][j] > 0) {
-      return [[i + 1, j, 'S']];
-    }
-    if (lastMove !== 'S' && this.numVisitable[i - 1] && this.numVisitable[i - 1][j] > 0) {
-      return [[i - 1, j, 'N']];
-    }
-    if (lastMove !== 'W' && this.numVisitable[i][j + 1] > 0) {
-      return [[i, j + 1, 'E']];
-    }
-    if (lastMove !== 'E' && this.numVisitable[i][j - 1] > 0) {
-      return [[i, j - 1, 'W']];
-    }
     return visitable;
   }
-
 
   getCode(i, j) {
     return `${i},${j}`;
   }
 
+
+  resetMaze() {
+    //Every time we find a key, allow backtracking
+    this.maze = this.maze.map(line => line.map(char => {
+      if (char === '|') {
+        return '.';
+      } else {
+        return char;
+      }
+    }));
+  }
+
   visit(i, j, dir) {
-    this.stack.push(dir); //use stack size to check completion.
-    this.uniqueSet.add(this.getCode(i, j));
+    this.stepsTaken++;
+    if (this.maze[i][j].search(/[a-z]/) !== -1) {
+      this.keysFound.add(this.maze[i][j]);
+      this.resetMaze(); //allow backtracking
+    } else {
+      this.maze[i, j] = '|'; //prevent backtracking
+    }
     this.location = [i, j];
-    this.numVisitable[i][j]--;
   }
 
   finished() {
-    return this.keySet.size === this.numKeys;
+    return this.keysFound.size === this.numKeys;
   }
 
 

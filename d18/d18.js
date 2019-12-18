@@ -35,18 +35,18 @@ const findAllKeys = arr => {
     for (let j = 0; j < arr[i].length; j++) {
       if (arr[i][j].search(/[a-z]/) !== -1) {
         locOfKeys.push([i, j]);
-        console.log(arr[i][j]);
+        // console.log(arr[i][j]);
       }
     }
   }
   return locOfKeys;
 }
 
-const findOptimalPath = (arr, start, numKeys, numVisitable) => {
-  let initialTraverser = new Traverser(start, makeCopy(numVisitable), new Set(), numKeys);
-
+//BFS for the optimal path
+const findOptimalPath = (maze, start, numKeys) => {
+  let initialTraverser = new Traverser(start, makeCopy(maze), new Set(), numKeys);
   let traverserQueue = [initialTraverser];
-  let numBots = 0;
+
   while (true) {
     let nextTraverser = traverserQueue.shift();//grab first in line
 
@@ -56,9 +56,10 @@ const findOptimalPath = (arr, start, numKeys, numVisitable) => {
 
     let visitableArr = nextTraverser.getVisitable();
     let curLoc = [...nextTraverser.location]; //copy of location
-    let copyOfNumVisitable = makeCopy(nextTraverser.numVisitable);
-    let uniqueVisitedSet = new Set(nextTraverser.uniqueSet);
-    let lastStack = [...nextTraverser.stack];
+    let copyOfMaze = makeCopy(nextTraverser.maze);
+    let stepsTaken = nextTraverser.stepsTaken; //primitive
+    let uniquekeysFound = new Set(nextTraverser.keysFound);
+
     visitableArr.forEach((v, i) => {
       if (i === 0) {
         nextTraverser.visit(...v);
@@ -66,11 +67,10 @@ const findOptimalPath = (arr, start, numKeys, numVisitable) => {
       } else {
         let newGuy = new Traverser(
           curLoc,
-          makeCopy(copyOfNumVisitable),
-          uniqueVisitedSet,
-          numToVisit,
-          lastStack,
-          ++numBots
+          makeCopy(copyOfMaze),
+          uniquekeysFound,
+          numKeys,
+          stepsTaken
         )
         newGuy.visit(...v);
         traverserQueue.push(newGuy);
@@ -86,10 +86,11 @@ readFile(`ex1.txt`, '\n')
     let start = getStart(maze);
     let numKeys = findAllKeys(maze).length;
 
-    console.log(maze);
-    console.log(start);
-    console.log(numKeys);
-
+    // console.log(maze);
+    // console.log(start);
+    // console.log(numKeys);
+    let leastSteps = findOptimalPath(maze, start, numKeys);
+    console.log(leastSteps);
   });
 
 
