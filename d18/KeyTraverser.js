@@ -1,3 +1,4 @@
+//This file is from another attempt at part 1 where I attempted a BFS of the keyspace rather than Djikstra.
 class KeyTraverser {
 
   constructor(keysFound, currentKey, stepsTaken, keyMapping) {

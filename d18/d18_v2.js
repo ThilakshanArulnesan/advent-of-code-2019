@@ -1,8 +1,7 @@
 //Part 1 and 2 use the same code for this problem.
 const fs = require('fs');
 const { KeyFinder } = require('./KeyFinder.js');
-const { KeyTraverser } = require('./KeyTraverser.js');
-const util = require('util')
+const util = require('util');
 
 
 const readFile = (filename, splitToken) => {
@@ -36,10 +35,7 @@ const findAllKeys = arr => {
   for (let i = 0; i < arr.length; i++) {
     for (let j = 0; j < arr[i].length; j++) {
       if (arr[i][j].search(/[a-z]|@/) !== -1) {
-        locOfKeys[arr[i][j]] = [i, j]
-
-        // locOfKeys.push([i, j]);
-        // console.log(arr[i][j]);
+        locOfKeys[arr[i][j]] = [i, j];
       }
     }
   }
@@ -47,8 +43,7 @@ const findAllKeys = arr => {
 }
 
 const getStats = (key1, key2, maze) => {
-  // console.log('working on ', key1, key2);
-  // console.log(maze.map(line => line.join('')));
+
   //Do a BFS to find 1) Min. distance between keys
   //2) Doors that are in the way.
   let initialTraverser = new KeyFinder([...key1], makeCopy(maze), new Set(), [...key2]);
@@ -121,69 +116,6 @@ const getMappings = (keyLocs, maze) => {
   return map;
 }
 
-const getFastestRoute = (mapping) => {
-
-  console.log(util.inspect(mapping, { showHidden: false, depth: null }));
-
-  //For all reachable keys
-  //get fastest route given keys
-  //   But this is depth first...can find a path that is too long
-  // Instead do a BFS again? Find all keys we can get to & add to Q
-  // Keep exploring and adding to Q till we get to a state with all keys found
-
-  let initialTraverser = new KeyTraverser(['@'], '@', 0, mapping);
-  let traverserQueue = [initialTraverser];
-
-  while (true) {
-    traverserQueue.sort((a, b) => a.stepsTaken - b.stepsTaken);
-    let nextTraverser = traverserQueue.shift();
-
-    if (!nextTraverser) {
-      console.log('error');
-      return -1;
-    }
-
-    if (nextTraverser.finished()) { //is it done?
-      console.log(nextTraverser);
-      return nextTraverser.stepsTaken;
-    }
-    console.log(nextTraverser.stepsTaken);
-
-    let visitableArr = nextTraverser.getPossibleMoves();
-
-    let keysFound = [...nextTraverser.keysFound];
-    let stepsTaken = nextTraverser.stepsTaken; //primitive
-    let curKey = nextTraverser.currentKey; //copy of location
-
-    visitableArr.forEach((v, i) => {
-      if (i === 0) {
-        nextTraverser.makeMove(v);
-        traverserQueue.push(nextTraverser);
-      } else {
-        //  constructor(keysFound, currentKey, stepsTaken, keyMapping) {
-        let newGuy = new KeyTraverser(
-          keysFound,
-          curKey,
-          stepsTaken,
-          mapping
-        )
-        newGuy.makeMove(v);
-        let foundDupe = false;
-        //Check for dupe:
-        for (let traverser of traverserQueue) {
-          if (traverser.keysFound.sort().join('') === newGuy.keysFound.sort().join('')) {
-            foundDupe = true;
-            traverser.stepsTaken = Math.min(traverser.stepsTaken, newGuy.stepsTaken);
-          }
-        }
-        if (!foundDupe)
-          traverserQueue.push(newGuy);
-      }
-    });
-  }
-
-
-}
 
 const haveRequiredKeys = (key, holdingKeys, curKey, mapping) => {
 
