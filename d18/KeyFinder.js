@@ -1,33 +1,32 @@
-class Traverser {
+class KeyFinder {
 
-  constructor(start, maze, keysFound = new Set(), numKeys, stepsTaken = 0) {
+  constructor(start, maze, doorsInTheWay = new Set(), goal, stepsTaken = 0, botNum = 0) {
     this.stepsTaken = stepsTaken;
-    this.keysFound = new Set(keysFound);//Make a clone
-    this.numKeys = numKeys;
+    this.doorsInTheWay = new Set(doorsInTheWay);//Make a clone
     this.location = start;
     this.maze = maze;
-  }
-
-  isVisitable(i, j) {
-    if (this.numVisitable[i][j] > 0) {
-      return true;
-    } else {
-      return false;
-    }
+    this.goal = goal;
+    this.botNum = botNum;
   }
 
   canVisit(char) {
     //If its a key, a path, or a door with a key we have found, we can visit
     // console.log(char, char.search(/[a-z]|\./) !== -1, this.keysFound.has(char));
-    return char.search(/[a-z]|\./) !== -1 || this.keysFound.has(char);
+
+    return char.search(/#|-/) === -1;
   }
 
   getVisitable() {
     let visitable = [];
     let i = this.location[0];
     let j = this.location[1];
+    if (this.maze[i][j].search(/[A-Z]/) !== -1) {
+      // console.log('adding', this.maze[i][j]);
+      this.doorsInTheWay.add(this.maze[i][j])
+    }
 
-    this.maze[i][j] = '|'; //prevent backtracking
+
+    this.maze[i][j] = '-'; //prevent backtracking
 
     if (this.maze[i + 1] && this.canVisit(this.maze[i + 1][j])) {
       visitable.push([i + 1, j]);
@@ -41,14 +40,9 @@ class Traverser {
     if (this.canVisit(this.maze[i][j - 1])) {
       visitable.push([i, j - 1]);
     }
-    // console.log(`From (${i},${j}) we can visit `, visitable)
+
     return visitable;
   }
-
-  getCode(i, j) {
-    return `${i},${j}`;
-  }
-
 
   resetMaze() {
     //Every time we find a key, allow backtracking
@@ -63,17 +57,11 @@ class Traverser {
 
   visit(i, j) {
     this.stepsTaken++;
-    if (this.maze[i][j].search(/[a-z]/) !== -1) {
-      this.keysFound.add(this.maze[i][j].toUpperCase());
-      this.resetMaze(); //allow backtracking
-    }
     this.location = [i, j];
   }
 
   finished() {
-    return this.keysFound.size === this.numKeys;
+    return (this.location[0] === this.goal[0]) && (this.location[1] === this.goal[1]);
   }
-
-
 }
-module.exports = { Traverser };
+module.exports = { KeyFinder };

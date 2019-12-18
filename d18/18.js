@@ -1,6 +1,5 @@
 //Part 1 and 2 use the same code for this problem.
 const fs = require('fs');
-const { Traverser } = require('./Traverser.js');
 const { KeyFinder } = require('./KeyFinder.js');
 const { KeyTraverser } = require('./KeyTraverser.js');
 const util = require('util')
@@ -46,61 +45,6 @@ const findAllKeys = arr => {
   }
   return locOfKeys;
 }
-
-//BFS for the optimal path
-const findOptimalPath = (maze, start, numKeys, keyLocs) => {
-  let initialTraverser = new Traverser(start, makeCopy(maze), new Set(), numKeys);
-  let traverserQueue = [initialTraverser];
-  botNum = 0;
-  let numIter = 0;
-  while (true) {
-    // console.log(`${traverserQueue.length} dudes looking`);
-    numIter++;
-    traverserQueue.sort((a, b) => {
-
-      return a.stepsTaken - b.stepsTaken; //sort bt least steps taken
-
-    }); //most keys first
-
-    let nextTraverser = traverserQueue.shift();//grab first in line
-    // if (nextTraverser.botNum === 2) {
-    // console.log(`${traverserQueue.length + 1} dudes looking. Current dude at ${nextTraverser.stepsTaken} steps.Position ${nextTraverser.location}`, nextTraverser.keysFound);
-    // }
-    if (!nextTraverser) {
-      console.log('error');
-      return -1;
-    }
-
-    if (nextTraverser.finished()) { //is it done?
-      return nextTraverser.stepsTaken;
-    }
-
-    let visitableArr = nextTraverser.getVisitable();
-    let curLoc = [...nextTraverser.location]; //copy of location
-    let copyOfMaze = makeCopy(nextTraverser.maze);
-    let stepsTaken = nextTraverser.stepsTaken; //primitive
-    let uniquekeysFound = new Set(nextTraverser.keysFound);
-
-    visitableArr.forEach((v, i) => {
-      if (i === 0) {
-        nextTraverser.visit(...v);
-        traverserQueue.push(nextTraverser);
-      } else {
-        // console.log('new guy has steps of', stepsTaken);
-        let newGuy = new Traverser(
-          curLoc,
-          makeCopy(copyOfMaze),
-          uniquekeysFound,
-          numKeys,
-          stepsTaken,
-          ++botNum
-        )
-        newGuy.visit(...v);
-        traverserQueue.push(newGuy);
-      }
-    });
-  }
-};
 
 const getStats = (key1, key2, maze) => {
   // console.log('working on ', key1, key2);
@@ -153,9 +97,6 @@ const getStats = (key1, key2, maze) => {
       }
     });
   }
-
-
-
 }
 
 const getMappings = (keyLocs, maze) => {
@@ -183,14 +124,13 @@ const getMappings = (keyLocs, maze) => {
 const getFastestRoute = (mapping) => {
 
   console.log(util.inspect(mapping, { showHidden: false, depth: null }));
-  //For all reachable keys
 
+  //For all reachable keys
   //get fastest route given keys
   //   But this is depth first...can find a path that is too long
   // Instead do a BFS again? Find all keys we can get to & add to Q
   // Keep exploring and adding to Q till we get to a state with all keys found
 
-  //  constructor(keysFound, currentKey, stepsTaken, keyMapping) {
   let initialTraverser = new KeyTraverser(['@'], '@', 0, mapping);
   let traverserQueue = [initialTraverser];
 
@@ -272,7 +212,7 @@ const getPossibleMoves = (currentState, keyList, mapping) => {
 }
 
 const dijkstra = (mapping) => {
-  console.log(util.inspect(mapping, { showHidden: false, depth: null }));
+  // console.log(util.inspect(mapping, { showHidden: false, depth: null })); //Map of min distance from one key to the next
   let seenStates = { '@-@': 0 };
   //@-A, @-B, B-BA
 
@@ -284,70 +224,54 @@ const dijkstra = (mapping) => {
     // console.log(priorityQueue);
 
     priorityQueue.sort((a, b) => {
-      // let keyOrder = b.split('-')[1].length - a.split('-')[1].length;
-      // if (keyOrder !== 0)
-      //   return keyOrder;
-
-      // return seenStates[a] - seenStates[b];
+      //Additional heuristic: Num of keys found (more = better)
       return (seenStates[a] + (finishedCondition - a.length - 2) * 10) - (seenStates[b] + (finishedCondition - a.length - 2) * 10);
     });
-    // console.log(priorityQueue)
-    // console.log(seenStates)
+
 
     let nextElement = priorityQueue.shift();
     let nextMoves = getPossibleMoves(nextElement, keyList, mapping);
-    // console.log(seenStates);
-    // console.log(nextElement);
-    // console.log(nextElement);
+
     if (nextElement.split('-')[1].length === finishedCondition) {
       return seenStates[nextElement];
     }
+
     nextMoves.forEach(m => {
       const [p1, p2] = nextElement.split('-');
       let theMove = m[0] + '-' + (p2 + m[0]).split('').sort().join('');
       if (seenStates[theMove]) {
-        if (seenStates[theMove] > seenStates[nextElement] + m[1]) {
+        if (seenStates[theMove] > seenStates[nextElement] + m[1]) { //Only add elements to search tree if the path was shorter than before
           seenStates[theMove] = seenStates[nextElement] + m[1];
-          if (!priorityQueue.includes(theMove)) {
+          if (!priorityQueue.includes(theMove)) { //Don't add states that are already in the queue
             priorityQueue.push(theMove);
           }
         }
-        // seenStates[theMove] = Math.min(seenStates[theMove], seenStates[nextElement] + m[1]);
       } else {
         seenStates[theMove] = seenStates[nextElement] + m[1];
         if (!priorityQueue.includes(theMove)) {
           priorityQueue.push(theMove);
         }
       }
-      // if (!priorityQueue.includes(theMove)) {
-      //   priorityQueue.push(theMove);
-      // }
+
     });
 
   }
-
-
-  // seenStates[a-ABDEF] = 3
-  // Now what????
-
 }
 
 
 
-readFile(`18.txt`, '\n')
+readFile(`ex1.txt`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
-    let start = getStart(maze);
-    let keyLocs = findAllKeys(maze);
-    let numKeys = Object.keys(keyLocs).length;
-    let BFSResults = getMappings(keyLocs, maze);
 
+    //Grab all the key locations in the maze
+    let keyLocs = findAllKeys(maze);
+    //Do a BFS to find the minimum distances between each key. This speeds up the search later
+    let BFSResults = getMappings(keyLocs, maze);
+    //Use Dijkstra to find the shortest path to reaching all keys
     let leastSteps = dijkstra(BFSResults);
 
     console.log(leastSteps);
-
-    // let leastSteps = findOptimalPath(maze, start, numKeys, keyLocs);
-    // console.log(leastSteps);
   });
 
 

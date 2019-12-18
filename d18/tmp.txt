@@ -1,0 +1,54 @@
+Map
+{ f:
+   { e: { steps: 6, doorsInTheWay: Set { 'D', 'E' } },
+     b: { steps: 10, doorsInTheWay: Set { 'D', 'E', 'C' } },
+     '@': { steps: 14, doorsInTheWay: Set { 'D', 'E', 'C', 'A' } },
+     a: { steps: 16, doorsInTheWay: Set { 'D', 'E', 'C', 'A' } },
+     c:
+      { steps: 20, doorsInTheWay: Set { 'D', 'E', 'C', 'A', 'B' } },
+     d:
+      { steps: 44, doorsInTheWay: Set { 'D', 'E', 'C', 'A', 'B' } } },
+  e:
+   { f: { steps: 6, doorsInTheWay: Set { 'D', 'E' } },
+     b: { steps: 4, doorsInTheWay: Set { 'C' } },
+     '@': { steps: 8, doorsInTheWay: Set { 'C', 'A' } },
+     a: { steps: 10, doorsInTheWay: Set { 'C', 'A' } },
+     c: { steps: 14, doorsInTheWay: Set { 'C', 'A', 'B' } },
+     d: { steps: 38, doorsInTheWay: Set { 'C', 'A', 'B' } } },
+  b:
+   { f: { steps: 10, doorsInTheWay: Set { 'D', 'E', 'C' } },
+     e: { steps: 4, doorsInTheWay: Set { 'C' } },
+     '@': { steps: 4, doorsInTheWay: Set { 'A' } },
+     a: { steps: 6, doorsInTheWay: Set { 'A' } },
+     c: { steps: 10, doorsInTheWay: Set { 'A', 'B' } },
+     d: { steps: 34, doorsInTheWay: Set { 'A', 'B' } } },
+  '@':
+   { f: { steps: 14, doorsInTheWay: Set { 'D', 'E', 'C', 'A' } },
+     e: { steps: 8, doorsInTheWay: Set { 'C', 'A' } },
+     b: { steps: 4, doorsInTheWay: Set { 'A' } },
+     a: { steps: 2, doorsInTheWay: Set {} },
+     c: { steps: 6, doorsInTheWay: Set { 'B' } },
+     d: { steps: 30, doorsInTheWay: Set { 'B' } } },
+  a:
+   { f: { steps: 16, doorsInTheWay: Set { 'D', 'E', 'C', 'A' } },
+     e: { steps: 10, doorsInTheWay: Set { 'C', 'A' } },
+     b: { steps: 6, doorsInTheWay: Set { 'A' } },
+     '@': { steps: 2, doorsInTheWay: Set {} },
+     c: { steps: 4, doorsInTheWay: Set { 'B' } },
+     d: { steps: 28, doorsInTheWay: Set { 'B' } } },
+  c:
+   { f:
+      { steps: 20, doorsInTheWay: Set { 'D', 'E', 'C', 'A', 'B' } },
+     e: { steps: 14, doorsInTheWay: Set { 'C', 'A', 'B' } },
+     b: { steps: 10, doorsInTheWay: Set { 'A', 'B' } },
+     '@': { steps: 6, doorsInTheWay: Set { 'B' } },
+     a: { steps: 4, doorsInTheWay: Set { 'B' } },
+     d: { steps: 24, doorsInTheWay: Set {} } },
+  d:
+   { f:
+      { steps: 44, doorsInTheWay: Set { 'D', 'E', 'C', 'A', 'B' } },
+     e: { steps: 38, doorsInTheWay: Set { 'C', 'A', 'B' } },
+     b: { steps: 34, doorsInTheWay: Set { 'A', 'B' } },
+     '@': { steps: 30, doorsInTheWay: Set { 'B' } },
+     a: { steps: 28, doorsInTheWay: Set { 'B' } },
+     c: { steps: 24, doorsInTheWay: Set {} } } }
