@@ -48,7 +48,13 @@ const findOptimalPath = (maze, start, numKeys) => {
   let traverserQueue = [initialTraverser];
 
   while (true) {
+    // console.log(`${traverserQueue.length} dudes looking`);
     let nextTraverser = traverserQueue.shift();//grab first in line
+    // console.log(`Current dude at ${nextTraverser.stepsTaken} steps`);
+    if (!nextTraverser) {
+      console.log('error');
+      return -1;
+    }
 
     if (nextTraverser.finished()) { //is it done?
       return nextTraverser.stepsTaken;
@@ -65,6 +71,7 @@ const findOptimalPath = (maze, start, numKeys) => {
         nextTraverser.visit(...v);
         traverserQueue.push(nextTraverser);
       } else {
+        // console.log('new guy has steps of', stepsTaken);
         let newGuy = new Traverser(
           curLoc,
           makeCopy(copyOfMaze),
