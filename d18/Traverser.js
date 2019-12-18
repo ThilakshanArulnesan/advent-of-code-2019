@@ -2,9 +2,9 @@ class Traverser {
   // Stack of direction travelled
   // Set of visited nodes
   // copy of visited node count
-  constructor(start, numVisitable, uniqueSet = new Set(), numToVisit, stack = [], botNum = 0) {
+  constructor(start, numVisitable, uniqueSet = new Set(), numKeys, stack = [], botNum = 0) {
     this.uniqueSet = new Set(uniqueSet);//Make a clone
-    this.numToVisit = numToVisit;
+    this.numKeys = numKeys;
     this.stack = [...stack];
     this.botNum = botNum;
 
@@ -88,8 +88,8 @@ class Traverser {
     this.numVisitable[i][j]--;
   }
 
-  visitedAll() {
-    return this.uniqueSet.size === this.numToVisit;
+  finished() {
+    return this.keySet.size === this.numKeys;
   }
 
 
