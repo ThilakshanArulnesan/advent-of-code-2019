@@ -26,13 +26,12 @@ readFile(`19.in`, ',')
         let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
         let reply = robot.analyze([i, j]);
         if (reply === 1) tot++;
-        console.log(reply);
         area[i][j] = reply;
       }
     }
 
+    console.log(area.map(line => line.join('')).join('\n'));
     console.log(tot);
-
   });
 
 
