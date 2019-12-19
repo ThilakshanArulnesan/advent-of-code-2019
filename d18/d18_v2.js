@@ -42,6 +42,19 @@ const findAllKeys = arr => {
   return locOfKeys;
 }
 
+const removeOtherMazeDoors = (arr, keyList) => {
+
+  for (let i = 0; i < arr.length; i++) {
+    for (let j = 0; j < arr[i].length; j++) {
+      if (arr[i][j].search(/[A-Z]/) !== -1) {
+        if (!keyList.includes(arr[i][j].toLowerCase())) {
+          arr[i][j] = '.';
+        }
+      }
+    }
+  }
+}
+
 const getStats = (key1, key2, maze) => {
 
   //Do a BFS to find 1) Min. distance between keys
@@ -69,7 +82,6 @@ const getStats = (key1, key2, maze) => {
 
     let curLoc = [...nextTraverser.location]; //copy of location
     let copyOfMaze = makeCopy(nextTraverser.maze);
-    // console.log(copyOfMaze.map(line => line.join('')));
 
     let stepsTaken = nextTraverser.stepsTaken; //primitive
     let doorsInTheWay = new Set(nextTraverser.doorsInTheWay);
@@ -95,7 +107,6 @@ const getStats = (key1, key2, maze) => {
 }
 
 const getMappings = (keyLocs, maze) => {
-  // console.log(keyLocs);
   let map = {};
   for (let key1 in keyLocs) { //optimize
     for (let key2 in keyLocs) {
@@ -132,14 +143,12 @@ const getPossibleMoves = (currentState, keyList, mapping) => {
   let moves = [];
   let [curKey, holdingKeys] = currentState.split('-');
   holdingKeys = holdingKeys.split('');
-  // console.log(this.keys);
   for (let key of keyList) {
     if (holdingKeys.includes(key)) continue; //don't go back to keys we've already found
     if (haveRequiredKeys(key, holdingKeys, curKey, mapping)) {
       moves.push([key, mapping[curKey][key].steps]);
     }
   }
-  // return moves.sort((a, b) => this.keyMapping[this.currentKey][a].steps - this.keyMapping[this.currentKey][b].steps);
   return moves;
 }
 
@@ -153,8 +162,6 @@ const dijkstra = (mapping) => {
   let priorityQueue = ['@-@'];
 
   while (true) {
-    // console.log(priorityQueue);
-
     priorityQueue.sort((a, b) => {
       //Additional heuristic: Num of keys found (more = better)
       return (seenStates[a] + (finishedCondition - a.length - 2) * 10) - (seenStates[b] + (finishedCondition - a.length - 2) * 10);
@@ -184,26 +191,74 @@ const dijkstra = (mapping) => {
           priorityQueue.push(theMove);
         }
       }
-
     });
-
   }
 }
 
 
-
-readFile(`ex1.txt`, '\n')
+readFile(`18_v2.txt`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
 
-    //Grab all the key locations in the maze
-    let keyLocs = findAllKeys(maze);
-    //Do a BFS to find the minimum distances between each key. This speeds up the search later
-    let BFSResults = getMappings(keyLocs, maze);
-    //Use Dijkstra to find the shortest path to reaching all keys
-    let leastSteps = dijkstra(BFSResults);
+    //Break the maze into four parts
+    let maze1 = [];
+    let maze2 = [];
+    let maze3 = [];
+    let maze4 = [];
 
-    console.log(leastSteps);
+    let num = Math.ceil(maze.length / 2);
+    for (let i = 0; i < num; i++) {
+      for (let j = 0; j < num; j++) {
+        if (!maze1[i]) {
+          maze1[i] = [];
+        }
+        if (!maze2[i]) {
+          maze2[i] = [];
+        }
+        if (!maze3[i]) {
+          maze3[i] = [];
+        }
+        if (!maze4[i]) {
+          maze4[i] = [];
+        }
+        maze4[i][j] = maze[i + num - 1][j + num - 1];
+        maze3[i][j] = maze[i][j + num - 1];
+        maze2[i][j] = maze[i + num - 1][j];
+        maze1[i][j] = maze[i][j];
+      }
+    }
+
+    let min = 0;
+
+    //Use technique from part 1 to solve each maze AFTER ignoring all doors that don't have keys
+    //We can ignore the other doors if we can assume that each robot can complete its maze optimally
+    //by waiting for another robot to open its doors. I.e. the robot does not need to go out of its
+    //way to solve its maze in a way that opens doors for the other robots' maze.
+    //This need not be the case, but it simplifies the work greatly if it is. It turns on in AoC
+    //the given problem satisfies the stated condition.
+
+    let keyLocs = findAllKeys(maze1);
+    removeOtherMazeDoors(maze1, Object.keys(keyLocs));
+    let BFSResults = getMappings(keyLocs, maze1);
+    min += dijkstra(BFSResults); //Add total steps for the maze
+
+    //Do the same for the other three mazes
+    keyLocs = findAllKeys(maze2);
+    removeOtherMazeDoors(maze2, Object.keys(keyLocs));
+    BFSResults = getMappings(keyLocs, maze2);
+    min += dijkstra(BFSResults);
+
+    keyLocs = findAllKeys(maze3);
+    removeOtherMazeDoors(maze3, Object.keys(keyLocs));
+    BFSResults = getMappings(keyLocs, maze3);
+    min += dijkstra(BFSResults);
+
+    keyLocs = findAllKeys(maze4);
+    removeOtherMazeDoors(maze4, Object.keys(keyLocs));
+    BFSResults = getMappings(keyLocs, maze4);
+    min += dijkstra(BFSResults);
+
+    console.log(min);
   });
 
 
