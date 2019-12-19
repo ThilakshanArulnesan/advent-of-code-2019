@@ -45,7 +45,7 @@ readFile(`19.in`, ',')
       for (let j = 0; j < sz; j++) {
         let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
         let reply = robot.analyze([i, j]);
-        if (reply === 1) tot++;
+        // if (reply === 1) tot++;
         area[i][j] = reply;
       }
     }
