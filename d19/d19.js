@@ -17,18 +17,21 @@ readFile(`19.in`, ',')
   .then(async (res) => {
     let codes = res.map(v => Number(v));
 
-    let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
 
     let area = [];
+    let tot = 0;
     for (let i = 0; i < 50; i++) {
+      area[i] = [];
       for (let j = 0; j < 50; j++) {
-        let reply = robot.analyze([0, 0]);
+        let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
+        let reply = robot.analyze([i, j]);
+        if (reply === 1) tot++;
         console.log(reply);
         area[i][j] = reply;
       }
     }
 
-    // console.log(area);
+    console.log(tot);
 
   });
 
