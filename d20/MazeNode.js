@@ -14,8 +14,8 @@ class MazeNode { //Assume maze is all connected
     return `${i},${j}`;
   }
 
-  addChild(nodeName, weight = Infinity) {
-    this.children.push({ childName: nodeName, weight: weight });
+  addChild(node, weight = Infinity) {
+    this.children.push({ node: node, weight: weight });
   }
 }
 module.exports = { MazeNode }

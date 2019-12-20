@@ -224,7 +224,7 @@ const createGraph = (maze, portals) => {
   //Go through portals and make the relationships between the nodes
 
   //Mark the start portal and end protal
-  console.log(portals);
+  // console.log(portals);
 
   portals.forEach((portal, i) => {
     const portalId = getId(portal.loc[0], portal.loc[1]);
@@ -250,7 +250,32 @@ const createGraph = (maze, portals) => {
   return [start, end];
 }
 
-readFile(`ex1.in`, '\n')
+const dijkstra = (start, end) => {
+  let seen = new Set();
+  start.dist = 0;
+  let priorityQueue = [start];
+
+  while (true) {
+    priorityQueue.sort((a, b) => a.dist - b.dist);
+    let curNode = priorityQueue.shift();
+    if (curNode === end) {
+      return end.dist;
+    }
+    if (!seen.has(curNode)) {
+      //update distances of all children:
+      for (let child of curNode.children) {
+        if (child.node.dist > curNode.dist + child.weight) {
+          child.node.dist = curNode.dist + child.weight;
+        }
+        priorityQueue.push(child.node);
+      }
+      seen.add(curNode);
+    }
+  }
+
+}
+
+readFile(`20.in`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
     console.log(maze.map(line => line.join('')).join('\n'));
@@ -258,7 +283,7 @@ readFile(`ex1.in`, '\n')
     let portals = findPortals(makeCopy(maze));
 
     console.log(maze.map(line => line.join('')).join('\n'));
-    console.log('portals:', portals);
+    // console.log('portals:', portals);
 
     //Optimizations:
     //Close dead ends (look for paths with 3 walls)
@@ -266,16 +291,17 @@ readFile(`ex1.in`, '\n')
     console.log(simplifiedMaze.map(line => line.join('')).join('\n'));
 
     //Dumb guess. 1288 is too high
-    console.log(simplifiedMaze.reduce((count, line) => { return count + line.reduce((p, c) => { if (c === '.') return p + 1; return p }, 0) }, 0));
+    // console.log(simplifiedMaze.reduce((count, line) => { return count + line.reduce((p, c) => { if (c === '.') return p + 1; return p }, 0) }, 0));
 
     //TODO
     //Create graph from maze
     let markedMaze = markImportantPoints(simplifiedMaze); //barely helps. Lets just do a BFS instead of Djikstra
-    console.log(markedMaze.map(line => line.join('')).join('\n'));
+    // console.log(markedMaze.map(line => line.join('')).join('\n'));
     const [start, end] = createGraph(markedMaze, portals);
-    Object.keys(nodeLookup).forEach(key => console.log(`${key}: ${nodeLookup[key].children.map(c => `${c.childName.i},${c.childName.j}`).join('//')}`));
+    // Object.keys(nodeLookup).forEach(key => console.log(`${key}: ${nodeLookup[key].children.map(c => `${c.node.i},${c.node.j} [${c.weight}]`).join('//')}`));
 
-
+    dijkstra(start, end);
+    console.log(end.dist);
   });
 
 
