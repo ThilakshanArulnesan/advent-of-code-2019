@@ -1,8 +1,8 @@
 //Part 1 and 2 use the same code for this problem.
 const fs = require('fs');
-const util = require('util');
 const { MazeNode } = require('./MazeNode');
 
+const nodeLookup = {}; //Will store references to vertexes of the graph
 
 const readFile = (filename, splitToken) => {
   return new Promise((res, rej) => {
@@ -68,8 +68,6 @@ const findPortals = maze => {
 }
 
 const removeDeadEnds = maze => {
-  // let mazeCopy = makeCopy(maze);
-
   const checkDeadEnd = (i, j) => {
     //Valid if it's not a hallway (only paths are both up/down or left/right)
     let count = 0
@@ -115,8 +113,6 @@ const removeDeadEnds = maze => {
     }
   }
 
-
-
   maze.forEach((line, i) => {
     line.forEach((letter, j) => {
       if (letter === '.') {
@@ -126,8 +122,6 @@ const removeDeadEnds = maze => {
   });
 
   return maze;
-
-
 }
 
 const markImportantPoints = maze => {
@@ -167,7 +161,6 @@ const markImportantPoints = maze => {
   return mazeCopy;
 }
 
-const nodeLookup = {};
 
 const getId = (i, j) => {
   return `${i},${j}`;
@@ -222,10 +215,7 @@ const createGraph = (maze, portals) => {
   });
 
   //Go through portals and make the relationships between the nodes
-
-  //Mark the start portal and end protal
-  // console.log(portals);
-
+  //Mark the start portal and end portals as well
   portals.forEach((portal, i) => {
     const portalId = getId(portal.loc[0], portal.loc[1]);
     if (portal.name === 'AA') {
@@ -278,29 +268,27 @@ const dijkstra = (start, end) => {
 readFile(`20.in`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
+    //Maze:
     console.log(maze.map(line => line.join('')).join('\n'));
-
     let portals = findPortals(makeCopy(maze));
 
-    console.log(maze.map(line => line.join('')).join('\n'));
-    // console.log('portals:', portals);
-
-    //Optimizations:
-    //Close dead ends (look for paths with 3 walls)
+    //Close dead ends (look for paths with 3 walls). 
     let simplifiedMaze = removeDeadEnds(makeCopy(maze));
+
+    //Maze without dead ends
     console.log(simplifiedMaze.map(line => line.join('')).join('\n'));
 
-    //Dumb guess. 1288 is too high
-    // console.log(simplifiedMaze.reduce((count, line) => { return count + line.reduce((p, c) => { if (c === '.') return p + 1; return p }, 0) }, 0));
+    //This is to slightly improve efficienty, mark out the important points
+    //These are wherever we have a junction, a portal, entrance, or exit
+    let markedMaze = markImportantPoints(simplifiedMaze);
 
-    //TODO
-    //Create graph from maze
-    let markedMaze = markImportantPoints(simplifiedMaze); //barely helps. Lets just do a BFS instead of Djikstra
-    // console.log(markedMaze.map(line => line.join('')).join('\n'));
+    //Creates a graph structure and stores references to the nodes in nodeLookup
     const [start, end] = createGraph(markedMaze, portals);
-    // Object.keys(nodeLookup).forEach(key => console.log(`${key}: ${nodeLookup[key].children.map(c => `${c.node.i},${c.node.j} [${c.weight}]`).join('//')}`));
 
+    //Use dijkstra to find the shortest path
     dijkstra(start, end);
+
+    //final answer
     console.log(end.dist);
   });
 

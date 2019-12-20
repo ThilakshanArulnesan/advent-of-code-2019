@@ -1,6 +1,5 @@
 //Part 1 and 2 use the same code for this problem.
 const fs = require('fs');
-const util = require('util');
 const { MazeNode } = require('./MazeNode2');
 
 const nodeLookup = {};
@@ -18,6 +17,7 @@ const makeCopy = arr => {
   return arr.map(line => line.slice());
 };
 
+//In part 2 portals behave differently, we will need to keep track of inner and outer portals
 const findPortals = maze => {
   let portals = [];
 
@@ -29,17 +29,14 @@ const findPortals = maze => {
         if (i < 3 || i > maze.length - 4 || j < 3 || j > maze[0].length - 4) {
           type = "OUTER_PORTAL";
         }
-        if (maze[i + 1] && maze[i + 1][j].search(/[A-Z]/) !== -1) {
-          //this is a portal opening down/up
+        if (maze[i + 1] && maze[i + 1][j].search(/[A-Z]/) !== -1) { //this is a portal opening down/up
           if (maze[i - 1] && maze[i - 1][j] === '.') {
-            //opening to portal
             portals.push({
               name: maze[i][j] + maze[i + 1][j],
               loc: [i - 1, j],
               type
             });
           } else if (maze[i + 2] && maze[i + 2][j] === '.') {
-            //opening to portal
             portals.push({
               name: maze[i][j] + maze[i + 1][j],
               loc: [i + 2, j],
@@ -73,12 +70,9 @@ const findPortals = maze => {
     })
   });
   return portals;
-
 }
 
 const removeDeadEnds = maze => {
-  // let mazeCopy = makeCopy(maze);
-
   const checkDeadEnd = (i, j) => {
     //Valid if it's not a hallway (only paths are both up/down or left/right)
     let count = 0
@@ -124,8 +118,6 @@ const removeDeadEnds = maze => {
     }
   }
 
-
-
   maze.forEach((line, i) => {
     line.forEach((letter, j) => {
       if (letter === '.') {
@@ -135,8 +127,6 @@ const removeDeadEnds = maze => {
   });
 
   return maze;
-
-
 }
 
 const markImportantPoints = maze => {
@@ -176,8 +166,6 @@ const markImportantPoints = maze => {
   return mazeCopy;
 }
 
-
-
 const getId = (i, j) => {
   return `${i},${j}`;
 }
@@ -192,9 +180,6 @@ const createGraph = (maze, portals) => {
       let incr = 0;
       while (true) {
         incr++;
-        // console.log(i + incr * multx)
-        // console.log(j + incr * multy)
-
         if (!maze[i + incr * multx]) break;
         if (!maze[i + incr * multx][j + incr * multy]) break;
 
@@ -214,7 +199,6 @@ const createGraph = (maze, portals) => {
     checkDirection(0, -1);
     checkDirection(1, 0);
     checkDirection(-1, 0);
-
   }
 
   //Loop through each O and find connection in each direction
@@ -303,25 +287,27 @@ const dijkstra = (start, end) => {
 readFile(`20.in`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
+    //Maze:
     console.log(maze.map(line => line.join('')).join('\n'));
-
+    //Find portals now also marks the portal as an 'inner' or 'outer' portal
     let portals = findPortals(makeCopy(maze));
 
-    console.log(maze.map(line => line.join('')).join('\n'));
-    // console.log('portals:', portals);
-
-    //Optimizations:
-    //Close dead ends (look for paths with 3 walls)
+    //Close dead ends (look for paths with 3 walls). 
     let simplifiedMaze = removeDeadEnds(makeCopy(maze));
+
+    //Maze without dead ends
     console.log(simplifiedMaze.map(line => line.join('')).join('\n'));
 
+    //This is to slightly improve efficienty, mark out the important points
+    //These are wherever we have a junction, a portal, entrance, or exit
     let markedMaze = markImportantPoints(simplifiedMaze);
 
-
+    //Creates a graph structure and stores references to the nodes in nodeLookup
     const [start, end] = createGraph(markedMaze, portals);
-    // Object.keys(nodeLookup).forEach(key => console.log(`${key}: ${nodeLookup[key].children.map(c => `${c.node.i},${c.node.j} [${c.weight}]`).join('//')}`));
 
+    //Use dijkstra to find the shortest path
     let leastSteps = dijkstra(start, end);
+
     console.log(leastSteps);
   });
 

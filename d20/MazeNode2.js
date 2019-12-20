@@ -15,6 +15,7 @@ class MazeNode { //Assume maze is all connected
     return `${this.i},${this.j}`;
   }
 
+  //We need to store the type of edge (inner portal, outer portal, or default(not a portal))
   addChild(node, weight = Infinity, type = 'DEFAULT') {
     this.children.push({ node: node, weight: weight, type: type });
   }
