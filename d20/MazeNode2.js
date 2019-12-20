@@ -11,11 +11,12 @@ class MazeNode { //Assume maze is all connected
 
   //Helpers:
   id() {
+
     return `${this.i},${this.j}`;
   }
 
-  addChild(node, weight = Infinity) {
-    this.children.push({ node: node, weight: weight });
+  addChild(node, weight = Infinity, type = 'DEFAULT') {
+    this.children.push({ node: node, weight: weight, type: type });
   }
 }
 module.exports = { MazeNode }
