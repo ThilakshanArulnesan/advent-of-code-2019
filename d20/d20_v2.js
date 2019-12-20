@@ -264,12 +264,12 @@ const createGraph = (maze, portals) => {
 const dijkstra = (start, end) => {
   let seen = new Set();
   start.dist = 0;
-  let priorityQueue = [start.id()];
+  let priorityQueue = [`${start.id()}-0`];//Format: '1,2-0' indicating co-ords 1,2 @ level 0
 
   while (true) {
-    priorityQueue.sort((a, b) => nodeLookup[a].dist - nodeLookup[b].dist);
+    priorityQueue.sort((a, b) => nodeLookup[a.split('-')[0]].dist - nodeLookup[b.split('-')[0]].dist);
     let curNodeId = priorityQueue.shift();
-    let curNode = nodeLookup[curNodeId];
+    let curNode = nodeLookup[curNodeId.split('-')[0]];
 
     if (curNode === end) {
       return end.dist;
@@ -280,7 +280,7 @@ const dijkstra = (start, end) => {
         if (child.node.dist > curNode.dist + child.weight) {
           child.node.dist = curNode.dist + child.weight;
         }
-        priorityQueue.push(child.node.id());
+        priorityQueue.push(`${child.node.id()}-0`);
       }
       seen.add(curNodeId);
     }
