@@ -167,7 +167,90 @@ const markImportantPoints = maze => {
   return mazeCopy;
 }
 
-readFile(`20.in`, '\n')
+const nodeLookup = {};
+
+const getId = (i, j) => {
+  return `${i},${j}`;
+}
+
+const createGraph = (maze, portals) => {
+  let start = [];
+  let end = [];
+
+  const addChildren = (node, i, j) => {
+
+    const checkDirection = (multx, multy) => {
+      let incr = 0;
+      while (true) {
+        incr++;
+        // console.log(i + incr * multx)
+        // console.log(j + incr * multy)
+
+        if (!maze[i + incr * multx]) break;
+        if (!maze[i + incr * multx][j + incr * multy]) break;
+
+        if (maze[i + incr * multx][j + incr * multy] === '#' || maze[i + incr * multx][j + incr * multy] === ' ') break;
+
+        if (maze[i + incr * multx][j + incr * multy] === 'O') {
+          let id = getId(i + incr * multx, j + incr * multy);
+          if (!nodeLookup[id]) {
+            nodeLookup[id] = new MazeNode(i + incr * multx, j + incr * multy);
+          }
+          node.addChild(nodeLookup[id], incr);
+          break;
+        };
+      }
+    }
+    checkDirection(0, 1);
+    checkDirection(0, -1);
+    checkDirection(1, 0);
+    checkDirection(-1, 0);
+
+  }
+
+  //Loop through each O and find connection in each direction
+  maze.forEach((line, i) => {
+    line.forEach((letter, j) => {
+      if (letter === 'O') {
+        let id = getId(i, j);
+        if (!nodeLookup[id]) {
+          nodeLookup[id] = new MazeNode(i, j);
+        }
+        addChildren(nodeLookup[id], Number(i), Number(j));
+      }
+    });
+  });
+
+  //Go through portals and make the relationships between the nodes
+
+  //Mark the start portal and end protal
+  console.log(portals);
+
+  portals.forEach((portal, i) => {
+    const portalId = getId(portal.loc[0], portal.loc[1]);
+    if (portal.name === 'AA') {
+      start = nodeLookup[portalId];
+    } else if (portal.name === 'ZZ') {
+      end = nodeLookup[portalId];
+    } else {
+      portals.forEach((otherPortal, j) => {
+        const otherPortalId = getId(otherPortal.loc[0], otherPortal.loc[1]);
+
+        if (otherPortal.name === portal.name &&
+          (otherPortal.loc[0] !== portal.loc[0] || otherPortal.loc[1] !== portal.loc[1])) {
+          //Grabs the matching portal
+          nodeLookup[portalId].addChild(nodeLookup[otherPortalId], 1); //make a connection between the portals
+        }
+      });
+    }
+
+  });
+
+
+  return [start, end];
+}
+
+readFile(`ex1.in`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
     console.log(maze.map(line => line.join('')).join('\n'));
@@ -189,6 +272,8 @@ readFile(`20.in`, '\n')
     //Create graph from maze
     let markedMaze = markImportantPoints(simplifiedMaze); //barely helps. Lets just do a BFS instead of Djikstra
     console.log(markedMaze.map(line => line.join('')).join('\n'));
+    const [start, end] = createGraph(markedMaze, portals);
+    Object.keys(nodeLookup).forEach(key => console.log(`${key}: ${nodeLookup[key].children.map(c => `${c.childName.i},${c.childName.j}`).join('//')}`));
 
 
   });
