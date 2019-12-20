@@ -5,7 +5,7 @@ class MazeNode { //Assume maze is all connected
   constructor(i, j, dist = Infinity) {
     this.i = i;
     this.j = j;
-    this.dist = dist;
+    this.dist = [dist];
     this.children = [];
   }
 

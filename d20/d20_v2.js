@@ -231,12 +231,6 @@ const createGraph = (maze, portals) => {
   });
 
   //Go through portals and make the relationships between the nodes
-
-  //Mark the start portal and end protal
-  console.log(maze.length);
-  console.log(maze[0].length)
-  console.log(portals);
-
   portals.forEach((portal, i) => {
     const portalId = getId(portal.loc[0], portal.loc[1]);
     if (portal.name === 'AA') {
@@ -263,32 +257,50 @@ const createGraph = (maze, portals) => {
 
 const dijkstra = (start, end) => {
   let seen = new Set();
-  start.dist = 0;
+  start.dist = [0];
   let priorityQueue = [`${start.id()}-0`];//Format: '1,2-0' indicating co-ords 1,2 @ level 0
-
   while (true) {
-    priorityQueue.sort((a, b) => nodeLookup[a.split('-')[0]].dist - nodeLookup[b.split('-')[0]].dist);
-    let curNodeId = priorityQueue.shift();
-    let curNode = nodeLookup[curNodeId.split('-')[0]];
+    // iterations--;
+    priorityQueue.sort((a, b) => {
+      let [aId, aDepth] = a.split('-');
+      let [bId, bDepth] = b.split('-');
 
-    if (curNode === end) {
-      return end.dist;
+      return nodeLookup[aId].dist[aDepth] - nodeLookup[bId].dist[bDepth];
+    });
+    const curNodeInfo = priorityQueue.shift();
+    let [curNodeId, curDepth] = curNodeInfo.split('-');
+    // curDepth = Number(curDepth);
+    const curNode = nodeLookup[curNodeId];
+    if (curNode === end && curDepth === '0') {
+      return end.dist[curDepth];
     }
-    if (!seen.has(curNodeId)) {
+
+    if (!seen.has(curNodeInfo)) {
       //update distances of all children:
       for (let child of curNode.children) {
-        if (child.node.dist > curNode.dist + child.weight) {
-          child.node.dist = curNode.dist + child.weight;
+        let childDepth = Number(curDepth);
+        if (child.type === 'OUTER_PORTAL') {
+          childDepth--;
         }
-        priorityQueue.push(`${child.node.id()}-0`);
+        if (child.type === 'INNER_PORTAL') {
+          childDepth++;
+        }
+
+        if (child.node.dist[childDepth] === undefined || (child.node.dist[childDepth] > curNode.dist[curDepth] + child.weight)) {
+          //If its not an inner or outer portal (i.e. default) we keep the depth the same
+          if (childDepth >= 0)
+            child.node.dist[childDepth] = curNode.dist[curDepth] + child.weight;
+        }
+        if (childDepth >= 0)//don't allow moving into negative depths
+          priorityQueue.push(`${child.node.id()}-${childDepth}`);
       }
-      seen.add(curNodeId);
+      seen.add(curNodeInfo);
     }
   }
 
 }
 
-readFile(`ex1.in`, '\n')
+readFile(`20.in`, '\n')
   .then(async (maze) => {
     maze = maze.map(line => line.split(''));
     console.log(maze.map(line => line.join('')).join('\n'));
@@ -303,18 +315,14 @@ readFile(`ex1.in`, '\n')
     let simplifiedMaze = removeDeadEnds(makeCopy(maze));
     console.log(simplifiedMaze.map(line => line.join('')).join('\n'));
 
-    //Dumb guess. 1288 is too high
-    // console.log(simplifiedMaze.reduce((count, line) => { return count + line.reduce((p, c) => { if (c === '.') return p + 1; return p }, 0) }, 0));
+    let markedMaze = markImportantPoints(simplifiedMaze);
 
-    //TODO
-    //Create graph from maze
-    let markedMaze = markImportantPoints(simplifiedMaze); //barely helps. Lets just do a BFS instead of Djikstra
-    // console.log(markedMaze.map(line => line.join('')).join('\n'));
+
     const [start, end] = createGraph(markedMaze, portals);
     // Object.keys(nodeLookup).forEach(key => console.log(`${key}: ${nodeLookup[key].children.map(c => `${c.node.i},${c.node.j} [${c.weight}]`).join('//')}`));
 
-    dijkstra(start, end);
-    console.log(end.dist);
+    let leastSteps = dijkstra(start, end);
+    console.log(leastSteps);
   });
 
 
