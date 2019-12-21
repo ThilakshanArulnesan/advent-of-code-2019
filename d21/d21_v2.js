@@ -21,6 +21,7 @@ readFile(`21.in`, ',')
 
     let plainTextInstructions =
       [
+        //Same instructions as part 1
         'NOT T T',
         'AND A T',
         'AND B T',
@@ -28,21 +29,23 @@ readFile(`21.in`, ',')
         'NOT T T',
         'AND D T',
 
+        //Check the next four tiles (like we did first four)
         'NOT J J',
         'AND E J',
         'AND F J',
         'AND G J',
+        //We are safe to jum if all the tiles were floor OR H is safe to jump to
         'OR H J',
+        //OR we can walk another step after making the jump
         'OR E J',
+        //If we need to jump and its safe to jump from where we land (or run forward), make the jump
         'AND T J',
 
         'RUN',
         ''
       ]
 
-
     let asciiInstructions = plainTextInstructions.join('\n').split('').map(char => char.charCodeAt(0));
-    console.log('ascii Inst', asciiInstructions);
 
     let result = [];
     while (true) {
@@ -50,16 +53,16 @@ readFile(`21.in`, ',')
       if (isNaN(ascii)) {
         break;
       } else {
-        if (ascii > 100) {
+        if (ascii > 10000) {
           result.push(ascii);
+        } else {
+          result.push(String.fromCharCode(ascii));
         }
-        result.push(String.fromCharCode(ascii));
-
       }
     }
     let output = result.join('').trim().split('\n');
-    // scaffArr = scaffArr.map(line => line.split(''));
-    console.log(output.join('\n'))
+    console.log(output.join('\n'));
+
   });
 
 

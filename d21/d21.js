@@ -21,11 +21,15 @@ readFile(`21.in`, ',')
 
     let plainTextInstructions =
       [
+        //Change Jump to true (for now its storing whether we need to jump)
         'NOT J J',
+        //If there a hole in a b or c, J will turn to false
         'AND A J',
         'AND B J',
         'AND C J',
+        //Do not J to make jump to true
         'NOT J J',
+        //But don't jump if the place we land is a hole (just walk forward and hope we can jump from the new position)
         'AND D J',
         'WALK',
         ''
@@ -33,7 +37,6 @@ readFile(`21.in`, ',')
 
 
     let asciiInstructions = plainTextInstructions.join('\n').split('').map(char => char.charCodeAt(0));
-    console.log('ascii Inst', asciiInstructions);
 
     let result = [];
     while (true) {
@@ -41,7 +44,7 @@ readFile(`21.in`, ',')
       if (isNaN(ascii)) {
         break;
       } else {
-        if (ascii > 50) {
+        if (ascii > 10000) {
           result.push(ascii);
         } else {
           result.push(String.fromCharCode(ascii));
@@ -49,7 +52,6 @@ readFile(`21.in`, ',')
       }
     }
     let output = result.join('').trim().split('\n');
-    // scaffArr = scaffArr.map(line => line.split(''));
     console.log(output.join('\n'))
   });
 
