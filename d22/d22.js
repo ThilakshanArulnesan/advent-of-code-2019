@@ -57,10 +57,11 @@ const dealWithIncrement = (cards, incr) => {
 
 
 
-readFile(`22.in`, '\n')
+readFile(`ex0.in`, '\n')
   .then(async (instructions) => {
 
-    const NUM_CARDS = 10007;
+    // const NUM_CARDS = 10007;
+    const NUM_CARDS = 10;
 
     instructions = instructions.map(transform);
 
@@ -87,6 +88,7 @@ readFile(`22.in`, '\n')
         }
       }
     });
+    console.log(cards);
     console.log(cards.findIndex(card => card === 2019));
   });
 
