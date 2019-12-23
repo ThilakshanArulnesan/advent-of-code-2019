@@ -162,7 +162,7 @@ readFile(`22.in`, '\n')
 
     //print((pow(A, n, D)*X + (pow(A, n, D)-1) * modinv(A-1, D) * B) % D)
 
-    const modExp = (a, b, n) => {
+    let modExp = (a, b, n) => {
       a = a % n; //start mod n
       let result = 1;
       let x = a;
@@ -183,15 +183,41 @@ readFile(`22.in`, '\n')
       return result;
     };
 
+    modExp = function(a, b, n) {
+      a = a % n;
+      var result = 1n;
+      var x = a;
+      while (b > 0) {
+        var leastSignificantBit = b % 2n;
+        b = b / 2n;
+        if (leastSignificantBit == 1n) {
+          result = result * x;
+          result = result % n;
+        }
+        x = x * x;
+        x = x % n;
+      }
+      return result;
+    };
 
+    //       = A^n*x + (A^n-1) / (A-1) * B
 
-    console.log(mod((modExp(A, NUM_SHUFFLES, NUM_CARDS) * X + (modExp(A, NUM_SHUFFLES, NUM_CARDS) - 1) * modinv(A - 1, NUM_CARDS) * B), NUM_CARDS));
+    let ans = mod(
+
+      (
+        modExp(BigInt(A), BigInt(NUM_SHUFFLES), BigInt(NUM_CARDS)) * BigInt(X)
+        + (modExp(BigInt(A), BigInt(NUM_SHUFFLES), BigInt(NUM_CARDS)) - 1n) * BigInt(modinv(A - 1, NUM_CARDS) * B)
+      )
+      , BigInt(NUM_CARDS));
+
+    console.log(ans);
 
 
     //82580230562965 too high
 
-    //59203893852588 too low
+    //59203893852588 too low <-- Most acc
     //36735486951082 too low
+
   });
 
 
