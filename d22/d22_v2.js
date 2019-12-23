@@ -4,6 +4,8 @@
 
 //The idea is to come up with a linear equation of the form f(x) = Ax + B [x = 2020]for the one entire reverse shuffle for our given input (i.e see my comment in line 1). Then we simply compose this function N times (i.e. f(f(...f(x))) ).  There is a pattern to this composition involving a geometric sum, which simplifies the work nicely. The final solution involves performing a calculation using the results of f(x) which is roughly O(log(N) where N is the number of shuffles).
 
+//One last note is that the solution only works if all numbers are converted to BigInt() in javascript, otherwise there is overflow errror!
+
 const fs = require('fs');
 const mod = (n, m) => {
   return ((n % m) + m) % m;
@@ -36,24 +38,19 @@ const transform = (instruction) => {
 }
 
 const reverseOrder = (numCards, target) => {
-  return numCards - 1 - target;
+  return numCards - 1n - target;
 }
 
 const cutN = (numCards, n, target) => {
-  // if (n < 0) {
-  //   n += numCards;
-  // }
   return (target + n + numCards) % numCards;
 }
 
 const modinv = (a, m) => {
   // validate inputs
-  [a, m] = [Number(a), Number(m)];
-  if (Number.isNaN(a) || Number.isNaN(m)) {
-    return NaN // invalid input
-  }
+  [a, m] = [BigInt(a), BigInt(m)];
+
   a = (a % m + m) % m; //forces positive
-  if (!a || m < 2) {
+  if (!a || m < 2n) {
     return NaN;// invalid input
   }
   // find the gcd
@@ -65,58 +62,65 @@ const modinv = (a, m) => {
     s.push({ a, b });
   }
 
-  if (a !== 1) {
+  if (a !== 1n) {
+    console.log("nanning")
     //gcd(a,m) === 1 iff there exists a multiplicative inverse
     return NaN // inverse does not exists
   }
   // find the inverse
-  let x = 1;
-  let y = 0;
-  for (let i = s.length - 2; i >= 0; --i) {
-    [x, y] = [y, x - y * Math.floor(s[i].a / s[i].b)];
+  let x = 1n;
+  let y = 0n;
+  for (let j = s.length - 2; j >= 0; --j) {
+    let i = BigInt(j);
+    [x, y] = [y, x - y * BigInt((s[i].a / s[i].b))];
   }
-  return (y % m + m) % m;
+  return BigInt((y % m + m) % m);
 }
 
 const dealWithIncrement = (numCards, incr, target) => {
-
-  return modinv(incr, numCards) * target % numCards;
   let cycle = target % incr;//3
 
-  let cardsDone = 0;
+  let cardsDone = 0n;
 
   let numExtra = numCards % incr; //3
 
-  let rem = 0;
+  let rem = 0n;
 
-  let cardsPerCycle = Math.floor(numCards / incr);
+  let cardsPerCycle = (numCards / incr);
   // for (let i = 0; i < cycle; i++) {
   while (rem !== cycle) {
     //Add cards for the full cycle
     cardsDone += cardsPerCycle;
     //The first few cycles may have extra cards
     if (rem < numExtra) {
-      cardsDone += 1;
+      cardsDone += 1n;
     }
     rem = (rem + (incr - (numCards % incr))) % incr;
     // rem = (rem + (incr - numCards ) % incr;
   }
-  return cardsDone + Math.floor(target / incr);
+  return cardsDone + (target / incr);
 
-  // return modinv(N, D) * i % D
+
+  //ALTERNATE APPROACH (I came up with the above approach. But u/etotheipi1 mentioned the one below which is conceptually simpler using modular arithmetic). Both my approach and the approach below yield the correct answer.
+  //The idea here is to take the position we're interested (initially 2020) divide it by our increment size (in the modular 'ring', which will inform us which number will map to 2020 after performing this shuffle shuffling).
+  // return modinv(incr, numCards) * target % numCards; //Performing 'modular division' by multiplying by inverse
+
 }
 
 // [ 0, 9, 8, 7, 6, 5, 4, 3, 2, 1 ] // incr 9
 readFile(`22.in`, '\n')
   .then(async (instructions) => {
     //Approach: find where cards 2020 gets mapped to if the num cards is X
-    // const NUM_CARDS = 10007;
-    // let X = 2604;
-    // const NUM_SHUFFLES = 1;
 
-    const NUM_CARDS = 119315717514047;
-    let X = 2020;
-    const NUM_SHUFFLES = 101741582076661;
+    //Test case (should give 2019):
+    // const NUM_CARDS = 10007n;
+    // let X = 2604n;
+    // const NUM_SHUFFLES = 1n;
+
+    //Given problem:
+    const NUM_CARDS = 119315717514047n;
+    let X = 2020n; //Target position
+    const NUM_SHUFFLES = 101741582076661n;
 
     const reverseOperations = (instructions, initialTarget) => {
       let newValue = initialTarget;
@@ -127,11 +131,11 @@ readFile(`22.in`, '\n')
             break;
           }
           case 1: {
-            newValue = cutN(NUM_CARDS, instruction.payload, newValue);
+            newValue = cutN(NUM_CARDS, BigInt(instruction.payload), newValue);
             break;
           }
           case 2: {
-            newValue = dealWithIncrement(NUM_CARDS, instruction.payload, newValue);
+            newValue = dealWithIncrement(NUM_CARDS, BigInt(instruction.payload), newValue);
             break;
           }
           default: {
@@ -155,35 +159,9 @@ readFile(`22.in`, '\n')
     // B = (Y-A*X) % D
     const B = mod((Y - A * X), NUM_CARDS);
 
-    console.log(Y);
-    console.log(Z);
-    console.log('A:', A)
-    console.log('B:', B)
-
     //print((pow(A, n, D)*X + (pow(A, n, D)-1) * modinv(A-1, D) * B) % D)
 
-    let modExp = (a, b, n) => {
-      a = a % n; //start mod n
-      let result = 1;
-      let x = a;
-
-      while (b > 0) {
-        let leastSignificantBit = b % 2; //0 or 1. Divides evenly or not. Only triggers first time and last time.
-        b = Math.floor(b / 2);
-        // b = b >> 1;
-
-        if (leastSignificantBit === 1) {
-          result = result * x;
-          result = result % n;
-        }
-
-        x = x * x;
-        x = x % n;
-      }
-      return result;
-    };
-
-    modExp = function(a, b, n) {
+    let modExp = function(a, b, n) {
       a = a % n;
       var result = 1n;
       var x = a;
@@ -200,25 +178,18 @@ readFile(`22.in`, '\n')
       return result;
     };
 
-    //       = A^n*x + (A^n-1) / (A-1) * B
 
     let ans = mod(
-
       (
         modExp(BigInt(A), BigInt(NUM_SHUFFLES), BigInt(NUM_CARDS)) * BigInt(X)
-        + (modExp(BigInt(A), BigInt(NUM_SHUFFLES), BigInt(NUM_CARDS)) - 1n) * BigInt(modinv(A - 1, NUM_CARDS) * B)
-      )
-      , BigInt(NUM_CARDS));
+        + (modExp(BigInt(A), BigInt(NUM_SHUFFLES), BigInt(NUM_CARDS)) - 1n)
+        * BigInt(modinv(A - 1n, NUM_CARDS) * B)
+      ), BigInt(NUM_CARDS));
 
-    console.log(ans);
+    console.log(ans);    //79608410258462
 
-
-    //82580230562965 too high
-
-    //59203893852588 too low <-- Most acc
-    //36735486951082 too low
-
-  });
+  })
+  .catch(err => console.log(err));
 
 
 
