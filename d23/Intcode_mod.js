@@ -4,6 +4,7 @@ class IntCodeProgram {
     this.code = code;
     this.pointer = pointer;
     this.relativeOffset = relativeOffset;
+    this.hangingInstructions = 0;
   }
 
   //Helpers:
@@ -96,8 +97,21 @@ class IntCodeProgram {
             }
             incr = 2;
           } else {
-            console.log("invalid input");
-            return NaN;
+            this.hangingInstructions++;
+            if (this.hangingInstructions > 100) {
+              this.hangingInstructions = 0;
+              return NaN;
+            } else {
+              //modified
+              // console.log('neg1');
+              // return NaN;
+              if (instructions[2] === 2) {
+                this.code[term1 + offset] = -1;
+              } else {
+                this.code[term1] = -1;
+              }
+              incr = 2;
+            }
           }
           break;
         }
