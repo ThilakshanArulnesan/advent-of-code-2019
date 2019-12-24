@@ -36,7 +36,7 @@ const startNetwork = readFile(`nic.in`, ',')
         let packet = [];
         if (!idling[i]) {
           while (true) {
-
+            //Keep asking for more output until the computer starts to idle
             let num = computer[i].analyze(instructions[i]);
 
             //Modified intcode will send NaN if it is idling (when no instructions have been sent to it in the last 100 checks)
@@ -45,16 +45,21 @@ const startNetwork = readFile(`nic.in`, ',')
               break;
             }
 
-            //Add the output of intcode
+            //Add the output of intcode to the packet
             packet.push(Number(num));
+            //If we have three packets, sent it off to the correct address
             if (packet.length === 3) {
+              //A network code of 255 is sent to NAT instead, which stores the number for later
               if (packet[0] === 255) {
                 nat[0] = packet[1];
                 nat[1] = packet[2];
               } else {
+                //Sends the packet to the computer with the appropriate address
                 instructions[packet[0]].push(packet[1], packet[2]);
+                //Mark that computer as not idle, it has a new instruction
                 idling[packet[0]] = false;
               }
+              //Clear the packet so we are ready for the next one
               packet.length = 0;
               packet = [];
             }
@@ -63,10 +68,12 @@ const startNetwork = readFile(`nic.in`, ',')
           //check if all are idle:
           let allIdling = idling.reduce((acc, cur) => cur && acc, true);
           if (allIdling) {
+            //Check if we are sending computer 0 the same code as the last time
             if (nat[1] === prevInst) {
               return prevInst;
             }
             prevInst = nat[1];
+            //Send the code to computer 0 and mark it as not idle
             instructions[0].push(nat[0], nat[1]);
             idling[0] = false;
           }
