@@ -34,19 +34,62 @@ const getGameInstructions = (robot, asciiInstructions) => {
     }
   }
   let output = result.join('').trim().split('\n');
-  // console.log(output.join('\n'));
 
   return output.join('\n');
 }
 
 const askQuestion = (robot) => {
-  // console.log("ASKING USER QUESTION")
+
   rl.question('Enter input: ', (answer) => {
-    // TODO: Log the answer in a database
-    // console.log(`Thank you for your valuable feedback: ${answer}`);
-    asciiInstructions = (answer + '\n').split('').map(char => char.charCodeAt(0));
-    getGameInstructions(robot, asciiInstructions);
-    // rl.close();
+
+    let out = 'ejected';
+    if (answer === 'brute') {
+      dance:
+      for (let i = 0; i < 256; i++) {
+        plainTextInstructions = [
+          'take space heater',
+          'take loom',
+          'take wreath',
+          'take space law space brochure',
+          'take pointer',
+          'take sand',
+          'take planetoid',
+          'take festive hat'
+        ];
+
+        optional = [
+          'drop space heater',
+          'drop loom',
+          'drop wreath',
+          'drop space law space brochure',
+          'drop pointer',
+          'drop sand',
+          'drop planetoid',
+          'drop festive hat'
+        ];
+
+        for (let j = 0; j < 8; j++) {
+          if ((i).toString(2)[j] === '1') {
+            plainTextInstructions.push(optional[j]);
+          }
+        }
+        plainTextInstructions.push('north', '\n');
+        console.log(plainTextInstructions);
+        let asciiInstructions = plainTextInstructions.join('\n').split('').map(char => char.charCodeAt(0));
+
+        out = getGameInstructions(robot, asciiInstructions);
+
+        if (out.indexOf('ejected') === -1) {
+
+          break dance;
+        }
+      }
+
+    } else {
+      asciiInstructions = (answer + '\n').split('').map(char => char.charCodeAt(0));
+      out = getGameInstructions(robot, asciiInstructions);
+    }
+
     askQuestion(robot);
   });
 }
@@ -57,17 +100,46 @@ readFile(`25.in`, ',')
 
     let robot = new IntCodeProgram([...codes], 0, 0); //initialze robot
 
-    let asciiInstructions = [];
+    // Played the game, found optimal path to get to room where we do a brute force search
+    plainTextInstructions = [
+      'south',
+      'take space heater',
+      'south',
+      'east',
+      'take loom',
+      'west',
+      'north',
+      'west',
+      'take wreath',
+      'south',
+      'take space law space brochure',
+      'south',
+      'take pointer',
+      'north',
+      'north',
+      'east',
+      'north',
+      'north',
+      'north',
+      'take sand',
+      'south',
+      'south',
+      'west',
+      'south',
+      'take planetoid',
+      'north',
+      'west',
+      'take festive hat',
+      'south',
+      'west\n'
+    ];
 
-    // let asciiInstructions = plainTextInstructions.join('\n').split('').map(char => char.charCodeAt(0));
+    let asciiInstructions = plainTextInstructions.join('\n').split('').map(char => char.charCodeAt(0));
 
     let result = [];
     getGameInstructions(robot, asciiInstructions);
     askQuestion(robot);
-    // while (true) {
 
-
-    // }
   });
 
 
