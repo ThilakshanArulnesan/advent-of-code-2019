@@ -39,7 +39,6 @@ class IntCodeProgram {
   analyze(input) {
     let incr = 4;
     let start = this.pointer;
-    // console.log(start);
     let offset = this.relativeOffset;
     // console.log(this.code);
 
@@ -96,7 +95,8 @@ class IntCodeProgram {
             }
             incr = 2;
           } else {
-            console.log("invalid input");
+            // console.log("Waiting");
+            // incr = 2;
             return NaN;
           }
           break;
